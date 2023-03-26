@@ -40,6 +40,10 @@
 #include "core/os/os.h"
 #include "core/string/string_name.h"
 
+#ifdef TOOLS_ENABLED
+#include "editor/editor_file_system.h"
+#endif
+
 #include "../interop_types.h"
 
 #include "modules/mono/csharp_script.h"
@@ -302,6 +306,19 @@ void godotsharp_internal_tie_managed_to_unmanaged_with_pre_setup(GCHandleIntPtr 
 
 void godotsharp_internal_new_csharp_script(Ref<CSharpScript> *r_dest) {
 	memnew_placement(r_dest, Ref<CSharpScript>(memnew(CSharpScript)));
+}
+
+void godotsharp_internal_editor_file_system_update_file(const String *p_script_path) {
+#if TOOLS_ENABLED
+	// If the EditorFileSystem singleton is available, update the file;
+	// otherwise, the file will be updated when the singleton becomes available.
+	EditorFileSystem *efs = EditorFileSystem::get_singleton();
+	if (efs) {
+		efs->update_file(*p_script_path);
+	}
+#else
+	CRASH_NOW_MSG("EditorFileSystem is only available when running in the Godot editor.");
+#endif
 }
 
 bool godotsharp_internal_script_load(const String *p_path, Ref<CSharpScript> *r_dest) {
@@ -1396,6 +1413,7 @@ static const void *unmanaged_callbacks[]{
 	(void *)godotsharp_engine_get_singleton,
 	(void *)godotsharp_stack_info_vector_resize,
 	(void *)godotsharp_stack_info_vector_destroy,
+	(void *)godotsharp_internal_editor_file_system_update_file,
 	(void *)godotsharp_internal_script_debugger_send_error,
 	(void *)godotsharp_internal_script_debugger_is_active,
 	(void *)godotsharp_internal_object_get_associated_gchandle,
