@@ -8,7 +8,7 @@
     <Description>Custom Godot Core C# source generator because I have nothing better to do.</Description>
     <Authors>Godot Engine contributors</Authors>
 
-    <PackageId>GdEcho.SourceGenerators</PackageId>
+    <PackageId>Echo.Godot.SourceGenerators</PackageId>
     <Version>4.0.1-echo</Version>
     <PackageVersion>$(PackageVersion_Godot_SourceGenerators)</PackageVersion>
     <RepositoryUrl>https://github.com/398utubzyt/godot/tree/4.0/modules/mono/editor/Godot.NET.Sdk/Godot.SourceGenerators</RepositoryUrl>
