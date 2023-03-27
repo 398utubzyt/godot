@@ -3,13 +3,13 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 
-    <Description>MSBuild .NET Sdk for Godot projects.</Description>
+    <Description>Custom Godot .NET Sdk because I don't feel like waiting for unfinished future releases.</Description>
     <Authors>Godot Engine contributors</Authors>
 
-    <PackageId>Godot.NET.Sdk</PackageId>
-    <Version>4.0.1</Version>
+    <PackageId>Godot.Echo.NET.Sdk</PackageId>
+    <Version>4.0.1-echo</Version>
     <PackageVersion>$(PackageVersion_Godot_NET_Sdk)</PackageVersion>
-    <RepositoryUrl>https://github.com/godotengine/godot/tree/master/modules/mono/editor/Godot.NET.Sdk</RepositoryUrl>
+    <RepositoryUrl>https://github.com/398utubzyt/godot/tree/4.0/modules/mono/editor/Godot.NET.Sdk</RepositoryUrl>
     <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
     <PackageType>MSBuildSdk</PackageType>
     <PackageTags>MSBuildSdk</PackageTags>
