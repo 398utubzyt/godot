@@ -14,8 +14,8 @@
     <Description>Custom Godot C# Editor API because I'm tired of waiting.</Description>
     <Authors>Godot Engine contributors</Authors>
 
-    <PackageId>Echo.GodotSharpEditor</PackageId>
-    <Version>4.0.1</Version>
+    <PackageId>GodotSharpEditor</PackageId>
+    <Version>4.0.1-echo</Version>
     <PackageVersion>$(PackageVersion_GodotSharp)</PackageVersion>
     <RepositoryUrl>https://github.com/398utubzyt/godot/tree/4.0/modules/mono/glue/GodotSharp/GodotSharpEditor</RepositoryUrl>
     <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
