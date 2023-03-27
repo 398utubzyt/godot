@@ -19,7 +19,7 @@
     <Description>Custom Godot C# Core API with newer features cause I can't wait that long for future releases.</Description>
     <Authors>Godot Engine contributors</Authors>
 
-    <PackageId>GdEchoSharp</PackageId>
+    <PackageId>Echo.GodotSharp</PackageId>
     <Version>4.0.1-echo</Version>
     <PackageVersion>$(PackageVersion_GodotSharp)</PackageVersion>
     <RepositoryUrl>https://github.com/398utubzyt/godot/tree/4.0/modules/mono/glue/GodotSharp</RepositoryUrl>
