@@ -5,13 +5,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup>
-    <Description>Core C# source generator for Godot projects.</Description>
+    <Description>Custom Godot Core C# source generator because I have nothing better to do.</Description>
     <Authors>Godot Engine contributors</Authors>
 
-    <PackageId>Godot.SourceGenerators</PackageId>
-    <Version>4.0.4</Version>
+    <PackageId>GdEcho.SourceGenerators</PackageId>
+    <Version>4.0.1-echo</Version>
     <PackageVersion>$(PackageVersion_Godot_SourceGenerators)</PackageVersion>
-    <RepositoryUrl>https://github.com/godotengine/godot/tree/master/modules/mono/editor/Godot.NET.Sdk/Godot.SourceGenerators</RepositoryUrl>
+    <RepositoryUrl>https://github.com/398utubzyt/godot/tree/4.0/modules/mono/editor/Godot.NET.Sdk/Godot.SourceGenerators</RepositoryUrl>
     <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
 

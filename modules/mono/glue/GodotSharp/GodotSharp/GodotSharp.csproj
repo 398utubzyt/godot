@@ -16,13 +16,13 @@
     <NoWarn>CS1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
-    <Description>Godot C# Core API.</Description>
+    <Description>Custom Godot C# Core API with newer features cause I can't wait that long for future releases.</Description>
     <Authors>Godot Engine contributors</Authors>
 
-    <PackageId>GodotSharp</PackageId>
-    <Version>4.0.4</Version>
+    <PackageId>GdEchoSharp</PackageId>
+    <Version>4.0.1-echo</Version>
     <PackageVersion>$(PackageVersion_GodotSharp)</PackageVersion>
-    <RepositoryUrl>https://github.com/godotengine/godot/tree/master/modules/mono/glue/GodotSharp/GodotSharp</RepositoryUrl>
+    <RepositoryUrl>https://github.com/398utubzyt/godot/tree/4.0/modules/mono/glue/GodotSharp</RepositoryUrl>
     <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
 
