@@ -209,6 +209,9 @@ void CreateDialog::_add_type(const String &p_type, const TypeCategory p_type_cat
 		return;
 	}
 
+	if (p_type.is_empty())
+		return;
+
 	String inherits;
 
 	TypeCategory inherited_type = TypeCategory::OTHER_TYPE;
@@ -262,8 +265,12 @@ void CreateDialog::_add_type(const String &p_type, const TypeCategory p_type_cat
 		}
 	}
 
-	// Should never happen, but just in case...
-	ERR_FAIL_COND(inherits.is_empty());
+	// Since it can happen, let's figure out why...
+	if (inherits.is_empty())
+	{
+		WARN_PRINT_ED(vformat("Inherited base class of type '%s' is empty.", p_type));
+		return;
+	}
 
 	_add_type(inherits, inherited_type);
 

@@ -384,5 +384,125 @@ namespace Godot.SourceGenerators
                 typeArgumentSyntax.GetLocation(),
                 typeArgumentSyntax.SyntaxTree.FilePath));
         }
+
+        public static readonly DiagnosticDescriptor GlobalClassMustImplementGodotObjectRule =
+            new DiagnosticDescriptor(id: "GD0401",
+                title: "The class must inherit the Godot.GodotObject or a derived child class",
+                messageFormat: "The class must inherit Godot.GodotObject: {0}",
+                category: "Usage",
+                DiagnosticSeverity.Error,
+                isEnabledByDefault: true,
+                "The class must be a valid Godot-compatible type. Inherit GodotObject or other child classes such as Node or Resource.");
+
+        public static void ReportGlobalClassMustImplementGodotObject(
+            SyntaxNodeAnalysisContext context,
+            SyntaxNode classSyntax,
+            ISymbol typeSymbol)
+        {
+            string message = $"The class '{typeSymbol.ToDisplayString()}' must inherit the Godot.GodotObject or a derived child class";
+
+            string description = $"{message}. Inherit GodotObject or other child classes such as Node or Resource.";
+
+            context.ReportDiagnostic(Diagnostic.Create(
+                new DiagnosticDescriptor(id: "GD0401",
+                    title: message,
+                    messageFormat: message,
+                    category: "Usage",
+                    DiagnosticSeverity.Error,
+                    isEnabledByDefault: true,
+                    description),
+                classSyntax.GetLocation(),
+                classSyntax.SyntaxTree.FilePath));
+        }
+
+        public static readonly DiagnosticDescriptor GlobalClassMustNotBeGenericRule =
+            new DiagnosticDescriptor(id: "GD0402",
+                title: "The class must not contain generic arguments",
+                messageFormat: "The class must not be generic: {0}",
+                category: "Usage",
+                DiagnosticSeverity.Error,
+                isEnabledByDefault: true,
+                "The class must be a non-generic type. Remove the generic arguments and inherit a non-global generic class.");
+
+        public static void ReportGlobalClassMustNotBeGeneric(
+            SyntaxNodeAnalysisContext context,
+            SyntaxNode classSyntax,
+            ISymbol typeSymbol)
+        {
+            string message = $"The class '{typeSymbol.ToDisplayString()}' must not contain any generic arguments";
+
+            string description = $"{message}. Inheriting a non-global generic class is acceptable.";
+
+            context.ReportDiagnostic(Diagnostic.Create(
+                new DiagnosticDescriptor(id: "GD0402",
+                    title: message,
+                    messageFormat: message,
+                    category: "Usage",
+                    DiagnosticSeverity.Error,
+                    isEnabledByDefault: true,
+                    description),
+                classSyntax.GetLocation(),
+                classSyntax.SyntaxTree.FilePath));
+        }
+
+        public static readonly DiagnosticDescriptor GlobalClassMustNotBeToolRule =
+            new DiagnosticDescriptor(id: "GD0403",
+                title: "The class must not have the Godot.ToolAttribute attribute",
+                messageFormat: "The class must not be a tool: {0}",
+                category: "Usage",
+                DiagnosticSeverity.Error,
+                isEnabledByDefault: true,
+                "The class must have the Godot.ToolAttribute attribute. Global tools are not supported.");
+
+        public static void ReportGlobalClassMustNotBeTool(
+            SyntaxNodeAnalysisContext context,
+            SyntaxNode classSyntax,
+            ISymbol typeSymbol)
+        {
+            string message = $"The class '{typeSymbol.ToDisplayString()}' must not have the Godot.ToolAttribute attribute";
+
+            string description = $"{message}. Global tools are not supported.";
+
+            context.ReportDiagnostic(Diagnostic.Create(
+                new DiagnosticDescriptor(id: "GD0403",
+                    title: message,
+                    messageFormat: message,
+                    category: "Usage",
+                    DiagnosticSeverity.Error,
+                    isEnabledByDefault: true,
+                    description),
+                classSyntax.GetLocation(),
+                classSyntax.SyntaxTree.FilePath));
+        }
+
+        public static readonly DiagnosticDescriptor ParentClassMustBeGlobalRule =
+            new DiagnosticDescriptor(id: "GD0404",
+                title: "The parent of the global class must be also global",
+                messageFormat: "The parent class must be global: {0}",
+                category: "Usage",
+                DiagnosticSeverity.Error,
+                isEnabledByDefault: true,
+                "The parent of the global class must also have the Godot.GlobalClassAttribute attribute.");
+
+        public static void ReportParentClassMustBeGlobal(
+            SyntaxNodeAnalysisContext context,
+            SyntaxNode classSyntax,
+            ISymbol typeSymbol)
+        {
+            string message = $"The parent of the class '{typeSymbol.ToDisplayString()}' must also be global";
+
+            string description = $"{message}. Add the Godot.GlobalClassAttribute attribute to the parent class.";
+
+            context.ReportDiagnostic(Diagnostic.Create(
+                new DiagnosticDescriptor(id: "GD0404",
+                    title: message,
+                    messageFormat: message,
+                    category: "Usage",
+                    DiagnosticSeverity.Error,
+                    isEnabledByDefault: true,
+                    description),
+                classSyntax.GetLocation(),
+                classSyntax.SyntaxTree.FilePath));
+        }
     }
 }

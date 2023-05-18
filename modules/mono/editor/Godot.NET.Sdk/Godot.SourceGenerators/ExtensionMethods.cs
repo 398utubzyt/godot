@@ -75,7 +75,7 @@ namespace Godot.SourceGenerators
             return godotClassName ?? nativeType.Name;
         }
 
-        private static bool IsGodotScriptClass(
+        private static bool TryGetGodotScriptClass(
             this ClassDeclarationSyntax cds, Compilation compilation,
             out INamedTypeSymbol? symbol
         )
@@ -102,7 +102,7 @@ namespace Godot.SourceGenerators
         {
             foreach (var cds in source)
             {
-                if (cds.IsGodotScriptClass(compilation, out var symbol))
+                if (cds.TryGetGodotScriptClass(compilation, out var symbol))
                     yield return (cds, symbol!);
             }
         }
@@ -237,6 +237,9 @@ namespace Godot.SourceGenerators
 
         public static bool IsGodotGlobalClassAttribute(this INamedTypeSymbol symbol)
             => symbol.ToString() == GodotClasses.GlobalClassAttr;
+
+        public static bool IsGodotToolAttribute(this INamedTypeSymbol symbol)
+            => symbol.ToString() == GodotClasses.ToolAttr;
 
         public static bool IsSystemFlagsAttribute(this INamedTypeSymbol symbol)
             => symbol.ToString() == GodotClasses.SystemFlagsAttr;
