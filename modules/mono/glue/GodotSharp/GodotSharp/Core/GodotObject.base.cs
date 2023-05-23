@@ -33,6 +33,9 @@ namespace Godot
             bool refCounted
         )
         {
+            if (cachedType.IsAbstract)
+                return;
+
             if (NativePtr == IntPtr.Zero)
             {
                 NativePtr = nativeCtor();

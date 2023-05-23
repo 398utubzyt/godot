@@ -531,6 +531,12 @@ Ref<Resource> ResourceLoader::load(const String &p_path, const String &p_type_hi
 		*r_error = ERR_CANT_OPEN;
 	}
 
+	if (p_path.is_empty())
+	{
+		WARN_PRINT("Resource load path was empty.");
+		return Ref<Resource>();
+	}
+
 	String local_path = _validate_local_path(p_path);
 
 	if (p_cache_mode != ResourceFormatLoader::CACHE_MODE_IGNORE) {
