@@ -551,13 +551,13 @@ bool CSharpLanguage::handles_global_class_type(const String &p_type) const {
 
 String CSharpLanguage::get_global_class_name(const String &p_path, String *r_base_type, String *r_icon_path) const {
 	Ref<CSharpScript> scr = ResourceLoader::load(p_path, get_type());
-	if (!scr.is_valid() || !scr->valid || !scr->global_class) {
-		// Invalid script or the script is not a global class.
-		return String();
-	}
+	// Always assign r_base_type and r_icon_path, even if the script
+	// is not a global one. In the case that it is not a global script,
+	// return an empty string AFTER assigning the return parameters.
+	// See modules/gdscript/gdscript.cpp:2499
 
-	String name = scr->class_name;
-	if (unlikely(name.is_empty())) {
+	if (!scr.is_valid() || !scr->valid) {
+		// Invalid script.
 		return String();
 	}
 
@@ -584,7 +584,8 @@ String CSharpLanguage::get_global_class_name(const String &p_path, String *r_bas
 			*r_base_type = scr->get_instance_base_type();
 		}
 	}
-	return name;
+
+	return scr->global_class ? scr->class_name : String();
 }
 
 String CSharpLanguage::debug_get_error() const {

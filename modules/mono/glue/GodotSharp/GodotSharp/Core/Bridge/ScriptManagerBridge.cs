@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
@@ -131,8 +132,7 @@ namespace Godot.Bridge
                 // Performance is not critical here as this will be replaced with source generators.
                 Type scriptType = _scriptTypeBiMap.GetScriptType(scriptPtr);
 
-                if (scriptType.IsAbstract)
-                    return godot_bool.False;
+                Debug.Assert(scriptType.IsAbstract, $"Cannot create script instance. The class '{scriptType.FullName}' is abstract.");
 
                 var ctor = scriptType
                     .GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
@@ -625,13 +625,13 @@ namespace Godot.Bridge
                     .FirstOrDefault();
 
                 *outGlobal = (globalAttr != null).ToGodotBool();
-                *outAbstract = scriptType.IsAbstract.ToGodotBool();
 
                 var iconAttr = scriptType.GetCustomAttributes(inherit: false)
                     .OfType<IconAttribute>()
                     .FirstOrDefault();
-
                 *outIconPath = Marshaling.ConvertStringToNative(iconAttr?.Path);
+
+                *outAbstract = scriptType.IsAbstract.ToGodotBool();
 
                 // Methods
 

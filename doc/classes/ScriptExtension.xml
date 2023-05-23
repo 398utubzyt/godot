@@ -136,6 +136,11 @@
 			<description>
 			</description>
 		</method>
+		<method name="_is_abstract" qualifiers="virtual const">
+			<return type="bool" />
+			<description>
+			</description>
+		</method>
 		<method name="_is_placeholder_fallback_enabled" qualifiers="virtual const">
 			<return type="bool" />
 			<description>
