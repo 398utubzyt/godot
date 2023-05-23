@@ -31,6 +31,7 @@
 #include "class_db.h"
 
 #include "core/config/engine.h"
+#include "core/io/resource_loader.h"
 #include "core/object/script_language.h"
 #include "core/os/mutex.h"
 #include "core/version.h"
@@ -404,7 +405,7 @@ bool ClassDB::is_virtual(const StringName &p_class) {
 		}
 		String path = ScriptServer::get_global_class_path(p_class);
 		Ref<Script> scr = ResourceLoader::load(path);
-		return scr.is_valid() && scr->is_valid() && !scr->is_abstract();
+		return scr.is_valid() && scr->is_valid() && scr->is_abstract();
 	}
 #ifdef TOOLS_ENABLED
 	if (ti->api == API_EDITOR && !Engine::get_singleton()->is_editor_hint()) {
