@@ -102,6 +102,7 @@ public:
 
 	EXBIND0RC(bool, is_tool)
 	EXBIND0RC(bool, is_valid)
+	EXBIND0RC(bool, is_abstract)
 
 	EXBIND0RC(ScriptLanguage *, get_language)
 	EXBIND1RC(bool, has_script_signal, const StringName &)
