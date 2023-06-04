@@ -232,6 +232,19 @@ void OS::crash(const String &p_message) {
 	CRASH_NOW_MSG(p_message);
 }
 
+int OS::popup(const String &p_title, const String &p_message, const Vector<String> &p_buttons) {
+	List<String> buttons;
+	for (String s : p_buttons)
+		buttons.push_back(s);
+	
+	int button = 0;
+	Error result = ::OS::get_singleton()->popup(p_title, p_message, buttons, &button);
+	if (result != OK) {
+		return -1;
+	}
+	return button;
+}
+
 Vector<String> OS::get_system_fonts() const {
 	return ::OS::get_singleton()->get_system_fonts();
 }
@@ -529,6 +542,7 @@ void OS::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("alert", "text", "title"), &OS::alert, DEFVAL("Alert!"));
 	ClassDB::bind_method(D_METHOD("crash", "message"), &OS::crash);
+	ClassDB::bind_method(D_METHOD("popup", "title", "message", "buttons"), &OS::popup);
 
 	ClassDB::bind_method(D_METHOD("set_low_processor_usage_mode", "enable"), &OS::set_low_processor_usage_mode);
 	ClassDB::bind_method(D_METHOD("is_in_low_processor_usage_mode"), &OS::is_in_low_processor_usage_mode);

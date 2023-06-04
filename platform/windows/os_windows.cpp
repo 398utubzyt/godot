@@ -55,6 +55,9 @@
 #include <shlobj.h>
 #include <wbemcli.h>
 
+#pragma comment(linker, "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
+#pragma comment(lib, "comctl32.lib")
+
 extern "C" {
 __declspec(dllexport) DWORD NvOptimusEnablement = 1;
 __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
@@ -128,6 +131,39 @@ BOOL WINAPI HandlerRoutine(_In_ DWORD dwCtrlType) {
 
 void OS_Windows::alert(const String &p_alert, const String &p_title) {
 	MessageBoxW(nullptr, (LPCWSTR)(p_alert.utf16().get_data()), (LPCWSTR)(p_title.utf16().get_data()), MB_OK | MB_ICONEXCLAMATION | MB_TASKMODAL);
+}
+
+Error OS_Windows::popup(const String &p_title, const String &p_message, const List<String> &p_buttons, int *r_pressed) {
+	TASKDIALOGCONFIG config;
+	ZeroMemory(&config, sizeof(TASKDIALOGCONFIG));
+	config.cbSize = sizeof(TASKDIALOGCONFIG);
+
+	Char16String title = p_title.utf16();
+	Char16String message = p_message.utf16();
+	List<Char16String> buttons;
+	for (String s : p_buttons)
+		buttons.push_back(s.utf16());
+
+	config.hwndParent = main_window;
+	config.pszWindowTitle = (LPCWSTR)(title.get_data());
+	config.pszContent = (LPCWSTR)(message.get_data());
+
+	int button_count = buttons.size();
+	if (button_count > 8)
+		button_count = 8;
+
+	config.cButtons = button_count;
+
+	TASKDIALOG_BUTTON *tbuttons = button_count != 0 ? (TASKDIALOG_BUTTON *)alloca(sizeof(TASKDIALOG_BUTTON) * button_count) : NULL;
+	if (tbuttons) {
+		for (int i = 0; i < button_count; i++) {
+			tbuttons[i].nButtonID = i;
+			tbuttons[i].pszButtonText = (LPCWSTR)(buttons[i].get_data());
+		}
+	}
+	config.pButtons = tbuttons;
+	
+	return SUCCEEDED(TaskDialogIndirect(&config, r_pressed, NULL, NULL)) ? OK : Error::FAILED;
 }
 
 void OS_Windows::initialize_debugging() {
