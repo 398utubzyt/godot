@@ -15,7 +15,8 @@ namespace Godot.SourceGenerators
             => ImmutableArray.Create(
                 Common.GlobalClassMustImplementGodotObjectRule,
                 Common.GlobalClassMustNotBeGenericRule,
-                Common.GlobalClassMustNotBeToolRule);
+                Common.GlobalClassMustNotBeToolRule,
+                Common.ParentClassMustBeGlobalRule);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -65,7 +66,7 @@ namespace Godot.SourceGenerators
                 return;
             var baseType = typeSymbol!.BaseType;
             if (!IsObjectFromGodotSharp(baseType) && !(baseType?.GetAttributes()
-                .Any(x => x.AttributeClass?.IsGodotClassNameAttribute() ?? false) ?? false))
+                .Any(x => x.AttributeClass?.IsGodotGlobalClassAttribute() ?? false) ?? false))
                 Common.ReportParentClassMustBeGlobal(context, typeClassDecl, typeSymbol);
         }
 
