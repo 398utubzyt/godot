@@ -897,8 +897,8 @@ public:
 	virtual void get_argument_options(const StringName &p_function, int p_idx, List<String> *r_options) const;
 
 	// Translate message (internationalization).
-	String tr(const StringName &p_message, const StringName &p_context = "") const;
-	String tr_n(const StringName &p_message, const StringName &p_message_plural, int p_n, const StringName &p_context = "") const;
+	Variant tr(const StringName &p_message, const StringName &p_context = "") const;
+	Variant tr_n(const StringName &p_message, const StringName &p_message_plural, int p_n, const StringName &p_context = "") const;
 
 	bool _is_queued_for_deletion = false; // Set to true by SceneTree::queue_delete().
 	bool is_queued_for_deletion() const;

@@ -1938,6 +1938,15 @@ void Control::release_focus() {
 	get_viewport()->gui_release_focus();
 }
 
+void Control::set_automatically_lose_focus(bool p_value)
+{
+	data.automatically_lose_focus = p_value;
+}
+bool Control::get_automatically_lose_focus() const
+{
+	return data.automatically_lose_focus;
+}
+
 static Control *_next_control(Control *p_from) {
 	if (p_from->is_set_as_top_level()) {
 		return nullptr; // Can't go above.
@@ -2887,6 +2896,19 @@ Control *Control::make_custom_tooltip(const String &p_text) const {
 
 // Base object overrides.
 
+
+void Control::input(const Ref<InputEvent>& p_event)
+{
+	if (!data.automatically_lose_focus)
+		return;
+
+	if (!p_event->is_class("InputEventMouseButton"))
+		return;
+	const Ref<InputEventMouseButton> &mouse_event = p_event;
+	if (!has_point(mouse_event->get_position()))
+		release_focus();
+}
+
 void Control::_notification(int p_notification) {
 	switch (p_notification) {
 		case NOTIFICATION_POSTINITIALIZE: {
@@ -3123,6 +3145,8 @@ void Control::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("has_focus"), &Control::has_focus);
 	ClassDB::bind_method(D_METHOD("grab_focus"), &Control::grab_focus);
 	ClassDB::bind_method(D_METHOD("release_focus"), &Control::release_focus);
+	ClassDB::bind_method(D_METHOD("set_automatically_lose_focus"), &Control::set_automatically_lose_focus);
+	ClassDB::bind_method(D_METHOD("get_automatically_lose_focus"), &Control::get_automatically_lose_focus);
 	ClassDB::bind_method(D_METHOD("find_prev_valid_focus"), &Control::find_prev_valid_focus);
 	ClassDB::bind_method(D_METHOD("find_next_valid_focus"), &Control::find_next_valid_focus);
 
@@ -3302,6 +3326,7 @@ void Control::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::NODE_PATH, "focus_next", PROPERTY_HINT_NODE_PATH_VALID_TYPES, "Control"), "set_focus_next", "get_focus_next");
 	ADD_PROPERTY(PropertyInfo(Variant::NODE_PATH, "focus_previous", PROPERTY_HINT_NODE_PATH_VALID_TYPES, "Control"), "set_focus_previous", "get_focus_previous");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "focus_mode", PROPERTY_HINT_ENUM, "None,Click,All"), "set_focus_mode", "get_focus_mode");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "automatically_lose_focus"), "set_automatically_lose_focus", "get_automatically_lose_focus");
 
 	ADD_GROUP("Mouse", "mouse_");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "mouse_filter", PROPERTY_HINT_ENUM, "Stop,Pass,Ignore"), "set_mouse_filter", "get_mouse_filter");

@@ -1031,18 +1031,18 @@ void DynamicFontImportSettings::_process_locales() {
 				String locale = item->get_text(0);
 				Ref<Translation> tr = ResourceLoader::load(locale);
 				if (tr.is_valid()) {
-					Vector<String> messages = tr->get_translated_message_list();
-					for (const String &E : messages) {
+					Array arr = tr->get_translated_message_list();
+					for (int j = 0; j < arr.size(); j++) {
 						RID text_rid = TS->create_shaped_text();
 						if (text_rid.is_valid()) {
-							TS->shaped_text_add_string(text_rid, E, font_main->get_rids(), 16, Dictionary(), tr->get_locale());
+							TS->shaped_text_add_string(text_rid, arr[j], font_main->get_rids(), 16, Dictionary(), tr->get_locale());
 							TS->shaped_text_shape(text_rid);
 							const Glyph *gl = TS->shaped_text_get_glyphs(text_rid);
 							const int gl_size = TS->shaped_text_get_glyph_count(text_rid);
 
-							for (int j = 0; j < gl_size; j++) {
-								if (gl[j].font_rid.is_valid() && gl[j].index != 0) {
-									import_variation_data->selected_glyphs.insert(gl[j].index);
+							for (int l = 0; l < gl_size; l++) {
+								if (gl[l].font_rid.is_valid() && gl[l].index != 0) {
+									import_variation_data->selected_glyphs.insert(gl[l].index);
 								}
 							}
 							TS->free_rid(text_rid);

@@ -210,7 +210,7 @@ bool OptimizedTranslation::_get(const StringName &p_name, Variant &r_ret) const 
 	return true;
 }
 
-StringName OptimizedTranslation::get_message(const StringName &p_src_text, const StringName &p_context) const {
+Variant OptimizedTranslation::get_message(const StringName &p_src_text, const StringName &p_context) const {
 	// p_context passed in is ignore. The use of context is not yet supported in OptimizedTranslation.
 
 	int htsize = hash_table.size();
@@ -267,8 +267,8 @@ StringName OptimizedTranslation::get_message(const StringName &p_src_text, const
 	}
 }
 
-Vector<String> OptimizedTranslation::get_translated_message_list() const {
-	Vector<String> msgs;
+Array OptimizedTranslation::get_translated_message_list() const {
+	Array msgs;
 
 	const int *htr = hash_table.ptr();
 	const uint32_t *htptr = (const uint32_t *)&htr[0];
@@ -300,7 +300,7 @@ Vector<String> OptimizedTranslation::get_translated_message_list() const {
 	return msgs;
 }
 
-StringName OptimizedTranslation::get_plural_message(const StringName &p_src_text, const StringName &p_plural_text, int p_n, const StringName &p_context) const {
+Variant OptimizedTranslation::get_plural_message(const StringName &p_src_text, const StringName &p_plural_text, int p_n, const StringName &p_context) const {
 	// The use of plurals translation is not yet supported in OptimizedTranslation.
 	return get_message(p_src_text, p_context);
 }

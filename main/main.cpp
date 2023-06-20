@@ -2221,17 +2221,6 @@ Error Main::setup2(Thread::ID p_main_tid_override) {
 		id->set_emulate_mouse_from_touch(bool(GLOBAL_DEF_BASIC("input_devices/pointing/emulate_mouse_from_touch", true)));
 	}
 
-	MAIN_PRINT("Main: Load Translations and Remaps");
-
-	translation_server->setup(); //register translations, load them, etc.
-	if (!locale.is_empty()) {
-		translation_server->set_locale(locale);
-	}
-	translation_server->load_translations();
-	ResourceLoader::load_translation_remaps(); //load remaps for resources
-
-	ResourceLoader::load_path_remaps();
-
 	MAIN_PRINT("Main: Load TextServer");
 
 	/* Enum text drivers */
@@ -2372,6 +2361,18 @@ Error Main::setup2(Thread::ID p_main_tid_override) {
 		// may want to import them first. Editor will reload those later.
 		rendering_server->global_shader_parameters_load_settings(!editor);
 	}
+
+	MAIN_PRINT("Main: Load Translations and Remaps");
+
+	translation_server->setup(); //register translations, load them, etc.
+	if (!locale.is_empty()) {
+		translation_server->set_locale(locale);
+	}
+	// Needs to load *after* script modules to allow global classes
+	translation_server->load_translations();
+	ResourceLoader::load_translation_remaps(); //load remaps for resources
+
+	ResourceLoader::load_path_remaps();
 
 	_start_success = true;
 
