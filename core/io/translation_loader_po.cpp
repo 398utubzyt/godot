@@ -32,7 +32,6 @@
 
 #include "core/io/file_access.h"
 #include "core/string/translation.h"
-#include "core/string/translation_po.h"
 
 Ref<Resource> TranslationLoaderPO::load_translation(Ref<FileAccess> f, Error *r_error) {
 	if (r_error) {
@@ -40,7 +39,7 @@ Ref<Resource> TranslationLoaderPO::load_translation(Ref<FileAccess> f, Error *r_
 	}
 
 	const String path = f->get_path();
-	Ref<TranslationPO> translation = Ref<TranslationPO>(memnew(TranslationPO));
+	Ref<Translation> translation = Ref<Translation>(memnew(Translation));
 	String config;
 
 	uint32_t magic = f->get_32();
@@ -110,11 +109,12 @@ Ref<Resource> TranslationLoaderPO::load_translation(Ref<FileAccess> f, Error *r_
 					int p_start = config.find("Plural-Forms");
 					if (p_start != -1) {
 						int p_end = config.find("\n", p_start);
-						translation->set_plural_rule(config.substr(p_start, p_end - p_start));
+						// TODO: Plural rules?
+						//translation->set_plural_rule(config.substr(p_start, p_end - p_start));
 					}
 				} else {
 					uint32_t str_start = 0;
-					Vector<String> plural_msg;
+					Array plural_msg;
 					for (uint32_t j = 0; j < str_len + 1; j++) {
 						if (data[j] == 0x00) {
 							if (msg_id_plural.is_empty()) {
@@ -149,7 +149,7 @@ Ref<Resource> TranslationLoaderPO::load_translation(Ref<FileAccess> f, Error *r_
 		String msg_id;
 		String msg_str;
 		String msg_context;
-		Vector<String> msgs_plural;
+		Array msgs_plural;
 
 		if (r_error) {
 			*r_error = ERR_FILE_CORRUPT;
@@ -226,8 +226,9 @@ Ref<Resource> TranslationLoaderPO::load_translation(Ref<FileAccess> f, Error *r_
 					int p_start = config.find("Plural-Forms");
 					if (p_start != -1) {
 						int p_end = config.find("\n", p_start);
-						translation->set_plural_rule(config.substr(p_start, p_end - p_start));
-						plural_forms = translation->get_plural_forms();
+						// TODO: Plural rules?
+						//translation->set_plural_rule(config.substr(p_start, p_end - p_start));
+						//plural_forms = translation->get_plural_forms();
 					}
 				}
 
@@ -297,7 +298,7 @@ Ref<Resource> TranslationLoaderPO::load_translation(Ref<FileAccess> f, Error *r_
 				msg_context += l;
 			} else if (status == STATUS_READING_PLURAL && plural_index >= 0) {
 				ERR_FAIL_COND_V_MSG(plural_index >= plural_forms, Ref<Resource>(), "Unexpected plural form while parsing: " + path + ":" + itos(line));
-				msgs_plural.write[plural_index] = msgs_plural[plural_index] + l;
+				msgs_plural.set(plural_index, msgs_plural[plural_index] + l);
 			}
 
 			line++;

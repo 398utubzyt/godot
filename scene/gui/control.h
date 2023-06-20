@@ -221,6 +221,7 @@ private:
 		NodePath focus_next;
 		NodePath focus_prev;
 
+		bool automatically_lose_focus = false;
 		ObjectID shortcut_context;
 
 		// Theming.
@@ -337,6 +338,7 @@ protected:
 
 	// Base object overrides.
 
+	void input(const Ref<InputEvent> &p_event) override;
 	void _notification(int p_notification);
 	static void _bind_methods();
 
@@ -520,6 +522,9 @@ public:
 	void grab_focus();
 	void grab_click_focus();
 	void release_focus();
+
+	void set_automatically_lose_focus(bool p_value);
+	bool get_automatically_lose_focus() const;
 
 	Control *find_next_valid_focus() const;
 	Control *find_prev_valid_focus() const;

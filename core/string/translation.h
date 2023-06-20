@@ -41,7 +41,7 @@ class Translation : public Resource {
 	RES_BASE_EXTENSION("translation");
 
 	String locale = "en";
-	HashMap<StringName, StringName> translation_map;
+	HashMap<StringName, HashMap<StringName, Variant>> translation_map;
 
 	virtual Vector<String> _get_message_list() const;
 	virtual Dictionary _get_messages() const;
@@ -50,21 +50,24 @@ class Translation : public Resource {
 protected:
 	static void _bind_methods();
 
-	GDVIRTUAL2RC(StringName, _get_message, StringName, StringName);
-	GDVIRTUAL4RC(StringName, _get_plural_message, StringName, StringName, int, StringName);
-
+	GDVIRTUAL3RC(bool, _can_add, StringName, Variant, StringName);
+	GDVIRTUAL2RC(Variant, _get_message, StringName, StringName);
+	GDVIRTUAL4RC(Variant, _get_plural_message, StringName, StringName, int, StringName);
+	
 public:
 	void set_locale(const String &p_locale);
 	_FORCE_INLINE_ String get_locale() const { return locale; }
 
-	virtual void add_message(const StringName &p_src_text, const StringName &p_xlated_text, const StringName &p_context = "");
-	virtual void add_plural_message(const StringName &p_src_text, const Vector<String> &p_plural_xlated_texts, const StringName &p_context = "");
-	virtual StringName get_message(const StringName &p_src_text, const StringName &p_context = "") const; //overridable for other implementations
-	virtual StringName get_plural_message(const StringName &p_src_text, const StringName &p_plural_text, int p_n, const StringName &p_context = "") const;
-	virtual void erase_message(const StringName &p_src_text, const StringName &p_context = "");
-	virtual void get_message_list(List<StringName> *r_messages) const;
-	virtual int get_message_count() const;
-	virtual Vector<String> get_translated_message_list() const;
+	bool can_add(const StringName &p_key, const Variant &p_text, const StringName &p_context = "") const;
+
+	void add_message(const StringName &p_key, const Variant &p_text, const StringName &p_context = "");
+	void add_plural_message(const StringName &p_key, const Array &p_texts, const StringName &p_context = "");
+	virtual Variant get_message(const StringName &p_key, const StringName &p_context = "") const;
+	virtual Variant get_plural_message(const StringName &p_key, const StringName &p_key_plural, int p_n, const StringName &p_context = "") const;
+	void erase_message(const StringName &p_key, const StringName &p_context = "");
+	void get_message_list(List<StringName> *r_messages) const;
+	int get_message_count() const;
+	virtual Array get_translated_message_list() const;
 
 	Translation() {}
 };
@@ -75,7 +78,7 @@ class TranslationServer : public Object {
 	String locale = "en";
 	String fallback;
 
-	HashSet<Ref<Translation>> translations;
+	HashMap<String, Vector<Ref<Translation>>> translations;
 	Ref<Translation> tool_translation;
 	Ref<Translation> doc_translation;
 	Ref<Translation> property_translation;
@@ -106,7 +109,7 @@ class TranslationServer : public Object {
 	bool _load_translations(const String &p_from);
 	String _standardize_locale(const String &p_locale, bool p_add_defaults) const;
 
-	StringName _get_message_from_translations(const StringName &p_message, const StringName &p_context, const String &p_locale, bool plural, const String &p_message_plural = "", int p_n = 0) const;
+	Variant _get_message_from_translations(const StringName &p_message, const StringName &p_context, const String &p_locale, bool plural, const String &p_message_plural = "", int p_n = 0) const;
 
 	static void _bind_methods();
 
@@ -135,7 +138,9 @@ public:
 
 	void set_locale(const String &p_locale);
 	String get_locale() const;
-	Ref<Translation> get_translation_object(const String &p_locale);
+	Array get_translation_objects(const String &p_locale) const;
+	int get_translation_object_count(const String &p_locale) const;
+	Ref<Translation> get_translation_object_at(const String &p_locale, int index) const;
 
 	Vector<String> get_all_languages() const;
 	String get_language_name(const String &p_language) const;
@@ -150,11 +155,13 @@ public:
 
 	PackedStringArray get_loaded_locales() const;
 
+	bool has_locale(const String &p_locale) const;
+
 	void add_translation(const Ref<Translation> &p_translation);
 	void remove_translation(const Ref<Translation> &p_translation);
 
-	StringName translate(const StringName &p_message, const StringName &p_context = "") const;
-	StringName translate_plural(const StringName &p_message, const StringName &p_message_plural, int p_n, const StringName &p_context = "") const;
+	Variant translate(const StringName &p_message, const StringName &p_context = "") const;
+	Variant translate_plural(const StringName &p_message, const StringName &p_message_plural, int p_n, const StringName &p_context = "") const;
 
 	StringName pseudolocalize(const StringName &p_message) const;
 
@@ -170,13 +177,13 @@ public:
 	String get_tool_locale();
 	void set_tool_translation(const Ref<Translation> &p_translation);
 	Ref<Translation> get_tool_translation() const;
-	StringName tool_translate(const StringName &p_message, const StringName &p_context = "") const;
-	StringName tool_translate_plural(const StringName &p_message, const StringName &p_message_plural, int p_n, const StringName &p_context = "") const;
+	Variant tool_translate(const StringName &p_message, const StringName &p_context = "") const;
+	Variant tool_translate_plural(const StringName &p_message, const StringName &p_message_plural, int p_n, const StringName &p_context = "") const;
 	void set_doc_translation(const Ref<Translation> &p_translation);
-	StringName doc_translate(const StringName &p_message, const StringName &p_context = "") const;
-	StringName doc_translate_plural(const StringName &p_message, const StringName &p_message_plural, int p_n, const StringName &p_context = "") const;
+	Variant doc_translate(const StringName &p_message, const StringName &p_context = "") const;
+	Variant doc_translate_plural(const StringName &p_message, const StringName &p_message_plural, int p_n, const StringName &p_context = "") const;
 	void set_property_translation(const Ref<Translation> &p_translation);
-	StringName property_translate(const StringName &p_message) const;
+	Variant property_translate(const StringName &p_message, const StringName &p_context = "") const;
 
 	void setup();
 

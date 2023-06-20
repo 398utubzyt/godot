@@ -149,7 +149,7 @@ Error read_all_file_utf8(const String &p_path, String &r_content) {
 	Vector<uint8_t> sourcef;
 	Error err;
 	Ref<FileAccess> f = FileAccess::open(p_path, FileAccess::READ, &err);
-	ERR_FAIL_COND_V_MSG(err != OK, err, "Cannot open file '" + p_path + "'.");
+	ERR_FAIL_COND_V_MSG(err != OK, err, "Cannot open file '" + p_path + vformat("'. (Error: %d)", err));
 
 	uint64_t len = f->get_length();
 	sourcef.resize(len + 1);

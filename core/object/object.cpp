@@ -1374,14 +1374,14 @@ void Object::initialize_class() {
 	initialized = true;
 }
 
-String Object::tr(const StringName &p_message, const StringName &p_context) const {
+Variant Object::tr(const StringName &p_message, const StringName &p_context) const {
 	if (!_can_translate || !TranslationServer::get_singleton()) {
 		return p_message;
 	}
 	return TranslationServer::get_singleton()->translate(p_message, p_context);
 }
 
-String Object::tr_n(const StringName &p_message, const StringName &p_message_plural, int p_n, const StringName &p_context) const {
+Variant Object::tr_n(const StringName &p_message, const StringName &p_message_plural, int p_n, const StringName &p_context) const {
 	if (!_can_translate || !TranslationServer::get_singleton()) {
 		// Return message based on English plural rule if translation is not possible.
 		if (p_n == 1) {
