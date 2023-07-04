@@ -15,8 +15,7 @@ namespace Godot.SourceGenerators
             => ImmutableArray.Create(
                 Common.GlobalClassMustImplementGodotObjectRule,
                 Common.GlobalClassMustNotBeGenericRule,
-                Common.ParentClassMustBeGlobalRule,
-                Common.GlobalClassMustNotBeToolRule);
+                Common.ParentClassMustBeGlobalRule);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -40,16 +39,16 @@ namespace Godot.SourceGenerators
             if (attrs == null)
                 return;
 
-            bool isTool = false, isGlobal = false;
+            bool isGlobal = false;
             foreach (var attribute in attrs)
             {
-                // Could probably break somewhere in here, but
-                // realistically nobody is using *that* many attributes
+                // Not sure the order of operations without the brackets,
+                // and I'm not willing to take the risk to find out...
+                if (!(attribute.AttributeClass?.IsGodotGlobalClassAttribute() ?? false))
+                    continue;
 
-                if (!isGlobal && (attribute.AttributeClass?.IsGodotGlobalClassAttribute() ?? false))
-                    isGlobal = true;
-                if (!isTool && (attribute.AttributeClass?.IsGodotToolAttribute() ?? false))
-                    isTool = true;
+                isGlobal = true;
+                break;
             }
 
             if (!isGlobal)
@@ -61,12 +60,6 @@ namespace Godot.SourceGenerators
 
             if (typeSymbol?.IsGenericType ?? false)
                 Common.ReportGlobalClassMustNotBeGeneric(context, typeClassDecl, typeSymbol);
-
-            // Global tools have some issues with non-tool resources--intentional?
-            // Not really sure how necessary this diagnostic is
-            // Older crashes seem to be fixed with https://github.com/godotengine/godot/pull/77377
-            if (isTool)
-                Common.ReportGlobalClassMustNotBeTool(context, typeClassDecl, typeSymbol!);
 
             if (!isGodot)
                 return;
