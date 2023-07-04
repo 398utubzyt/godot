@@ -238,6 +238,9 @@ namespace Godot.SourceGenerators
         public static bool IsGodotGlobalClassAttribute(this INamedTypeSymbol symbol)
             => symbol.ToString() == GodotClasses.GlobalClassAttr;
 
+        public static bool IsGodotToolAttribute(this INamedTypeSymbol symbol)
+            => symbol.ToString() == GodotClasses.ToolAttr;
+
         public static bool IsSystemFlagsAttribute(this INamedTypeSymbol symbol)
             => symbol.ToString() == GodotClasses.SystemFlagsAttr;
 
