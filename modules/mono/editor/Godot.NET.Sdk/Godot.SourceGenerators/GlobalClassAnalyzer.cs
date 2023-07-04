@@ -15,8 +15,8 @@ namespace Godot.SourceGenerators
             => ImmutableArray.Create(
                 Common.GlobalClassMustImplementGodotObjectRule,
                 Common.GlobalClassMustNotBeGenericRule,
-                Common.GlobalClassMustNotBeToolRule,
-                Common.ParentClassMustBeGlobalRule);
+                Common.ParentClassMustBeGlobalRule,
+                Common.GlobalClassMustNotBeToolRule);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -30,12 +30,12 @@ namespace Godot.SourceGenerators
             // Ignore syntax inside comments
             if (IsInsideDocumentation(context.Node))
                 return;
-            
             var typeClassDecl = (ClassDeclarationSyntax)context.Node;
 
             if (context.ContainingSymbol is not INamedTypeSymbol typeSymbol)
                 return;
 
+            // Search attributes for [GlobalClass] attribute
             var attrs = typeSymbol?.GetAttributes();
             if (attrs == null)
                 return;
@@ -43,6 +43,9 @@ namespace Godot.SourceGenerators
             bool isTool = false, isGlobal = false;
             foreach (var attribute in attrs)
             {
+                // Could probably break somewhere in here, but
+                // realistically nobody is using *that* many attributes
+
                 if (!isGlobal && (attribute.AttributeClass?.IsGodotGlobalClassAttribute() ?? false))
                     isGlobal = true;
                 if (!isTool && (attribute.AttributeClass?.IsGodotToolAttribute() ?? false))
@@ -58,12 +61,17 @@ namespace Godot.SourceGenerators
 
             if (typeSymbol?.IsGenericType ?? false)
                 Common.ReportGlobalClassMustNotBeGeneric(context, typeClassDecl, typeSymbol);
-            
+
+            // Global tools have some issues with non-tool resources--intentional?
+            // Not really sure how necessary this diagnostic is
+            // Older crashes seem to be fixed with https://github.com/godotengine/godot/pull/77377
             if (isTool)
                 Common.ReportGlobalClassMustNotBeTool(context, typeClassDecl, typeSymbol!);
 
             if (!isGodot)
                 return;
+
+            // I'd prefer if the GodotSharp stuff was already pre-annotated with [GlobalClass]...
             var baseType = typeSymbol!.BaseType;
             if (!IsObjectFromGodotSharp(baseType) && !(baseType?.GetAttributes()
                 .Any(x => x.AttributeClass?.IsGodotGlobalClassAttribute() ?? false) ?? false))
