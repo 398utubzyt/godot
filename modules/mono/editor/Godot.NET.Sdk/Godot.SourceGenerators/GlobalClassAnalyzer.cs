@@ -42,8 +42,6 @@ namespace Godot.SourceGenerators
             bool isGlobal = false;
             foreach (var attribute in attrs)
             {
-                // Not sure the order of operations without the brackets,
-                // and I'm not willing to take the risk to find out...
                 if (!(attribute.AttributeClass?.IsGodotGlobalClassAttribute() ?? false))
                     continue;
 
@@ -54,17 +52,18 @@ namespace Godot.SourceGenerators
             if (!isGlobal)
                 return;
 
-            bool isGodot = typeSymbol.InheritsFrom("GodotSharp", GodotClasses.GodotObject);
-            if (!isGodot)
-                Common.ReportGlobalClassMustImplementGodotObject(context, typeClassDecl, typeSymbol!);
-
             if (typeSymbol?.IsGenericType ?? false)
                 Common.ReportGlobalClassMustNotBeGeneric(context, typeClassDecl, typeSymbol);
 
-            if (!isGodot)
+            if (!typeSymbol.InheritsFrom("GodotSharp", GodotClasses.GodotObject))
+            {
+                Common.ReportGlobalClassMustImplementGodotObject(context, typeClassDecl, typeSymbol!);
+                // Return since there is a chance that there is no parent.
                 return;
+            }
 
             // I'd prefer if the GodotSharp stuff was already pre-annotated with [GlobalClass]...
+            // Suppresses a stupid 'editor\create_dialog.cpp:266 - Condition "inherits.is_empty()" is true.'
             var baseType = typeSymbol!.BaseType;
             if (!IsObjectFromGodotSharp(baseType) && !(baseType?.GetAttributes()
                 .Any(x => x.AttributeClass?.IsGodotGlobalClassAttribute() ?? false) ?? false))
