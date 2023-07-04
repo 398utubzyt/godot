@@ -445,38 +445,8 @@ namespace Godot.SourceGenerators
                 classSyntax.SyntaxTree.FilePath));
         }
 
-        public static readonly DiagnosticDescriptor GlobalClassMustNotBeToolRule =
-            new DiagnosticDescriptor(id: "GD0403",
-                title: "The class must not have the Godot.ToolAttribute attribute",
-                messageFormat: "The class must not be a tool: {0}",
-                category: "Usage",
-                DiagnosticSeverity.Error,
-                isEnabledByDefault: true,
-                "The class must have the Godot.ToolAttribute attribute. Global tools are not supported.");
-
-        public static void ReportGlobalClassMustNotBeTool(
-            SyntaxNodeAnalysisContext context,
-            SyntaxNode classSyntax,
-            ISymbol typeSymbol)
-        {
-            string message = $"The class '{typeSymbol.ToDisplayString()}' must not have the Godot.ToolAttribute attribute";
-
-            string description = $"{message}. Global tools are not supported.";
-
-            context.ReportDiagnostic(Diagnostic.Create(
-                new DiagnosticDescriptor(id: "GD0403",
-                    title: message,
-                    messageFormat: message,
-                    category: "Usage",
-                    DiagnosticSeverity.Error,
-                    isEnabledByDefault: true,
-                    description),
-                classSyntax.GetLocation(),
-                classSyntax.SyntaxTree.FilePath));
-        }
-
         public static readonly DiagnosticDescriptor ParentClassMustBeGlobalRule =
-            new DiagnosticDescriptor(id: "GD0404",
+            new DiagnosticDescriptor(id: "GD0403",
                 title: "The parent of the global class must be also global",
                 messageFormat: "The parent class must be global: {0}",
                 category: "Usage",
@@ -492,6 +462,36 @@ namespace Godot.SourceGenerators
             string message = $"The parent of the class '{typeSymbol.ToDisplayString()}' must also be global";
 
             string description = $"{message}. Add the Godot.GlobalClassAttribute attribute to the parent class.";
+
+            context.ReportDiagnostic(Diagnostic.Create(
+                new DiagnosticDescriptor(id: "GD0403",
+                    title: message,
+                    messageFormat: message,
+                    category: "Usage",
+                    DiagnosticSeverity.Error,
+                    isEnabledByDefault: true,
+                    description),
+                classSyntax.GetLocation(),
+                classSyntax.SyntaxTree.FilePath));
+        }
+
+        public static readonly DiagnosticDescriptor GlobalClassMustNotBeToolRule =
+            new DiagnosticDescriptor(id: "GD0404",
+                title: "The class must not have the Godot.ToolAttribute attribute",
+                messageFormat: "The class must not be a tool: {0}",
+                category: "Usage",
+                DiagnosticSeverity.Error,
+                isEnabledByDefault: true,
+                "The class must have the Godot.ToolAttribute attribute. Global tools are not supported.");
+
+        public static void ReportGlobalClassMustNotBeTool(
+            SyntaxNodeAnalysisContext context,
+            SyntaxNode classSyntax,
+            ISymbol typeSymbol)
+        {
+            string message = $"The class '{typeSymbol.ToDisplayString()}' must not have the Godot.ToolAttribute attribute";
+
+            string description = $"{message}. Global tools are not supported.";
 
             context.ReportDiagnostic(Diagnostic.Create(
                 new DiagnosticDescriptor(id: "GD0404",
