@@ -39,7 +39,7 @@ namespace Godot.SourceGenerators
                 Common.ReportGlobalClassMustNotBeGeneric(context, typeClassDecl, typeSymbol);
 
             if (!typeSymbol.InheritsFrom("GodotSharp", GodotClasses.GodotObject))
-                Common.ReportGlobalClassMustDeriveFromGodotObject(context, typeClassDecl, typeSymbol!);
+                Common.ReportGlobalClassMustDeriveFromGodotObject(context, typeClassDecl, typeSymbol);
         }
 
         /// <summary>
