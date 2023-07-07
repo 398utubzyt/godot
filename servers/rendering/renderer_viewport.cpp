@@ -919,6 +919,7 @@ void RendererViewport::viewport_attach_to_screen(RID p_viewport, const Rect2 &p_
 
 		viewport->viewport_to_screen_rect = p_rect;
 		viewport->viewport_to_screen = p_screen;
+		RSG::texture_storage->render_target_set_screen(viewport->render_target, true);
 	} else {
 		// if render_direct_to_screen was used, reset size and position
 		if (RSG::rasterizer->is_low_end() && viewport->viewport_render_direct_to_screen) {
@@ -928,6 +929,7 @@ void RendererViewport::viewport_attach_to_screen(RID p_viewport, const Rect2 &p_
 
 		viewport->viewport_to_screen_rect = Rect2();
 		viewport->viewport_to_screen = DisplayServer::INVALID_WINDOW_ID;
+		RSG::texture_storage->render_target_set_screen(viewport->render_target, false);
 	}
 }
 

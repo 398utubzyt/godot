@@ -1576,7 +1576,7 @@ Error VulkanContext::_initialize_queues(VkSurfaceKHR p_surface) {
 		// we want a 32bit RGBA unsigned normalized buffer or similar.
 		const VkFormat allowed_formats[] = {
 			VK_FORMAT_B8G8R8A8_UNORM,
-			VK_FORMAT_R8G8B8A8_UNORM
+			VK_FORMAT_R8G8B8A8_UNORM,
 		};
 		uint32_t allowed_formats_count = sizeof(allowed_formats) / sizeof(VkFormat);
 
@@ -1688,6 +1688,8 @@ Error VulkanContext::_window_create(DisplayServer::WindowID p_window_id, Display
 		Error err = _initialize_queues(p_surface);
 		ERR_FAIL_COND_V(err != OK, ERR_CANT_CREATE);
 	}
+
+	print_line("Creating new Vulkan window: %d", p_window_id);
 
 	Window window;
 	window.surface = p_surface;
@@ -1968,6 +1970,8 @@ Error VulkanContext::_update_swap_chain(Window *window) {
 
 	err = fpCreateSwapchainKHR(device, &swapchain_ci, nullptr, &window->swapchain);
 	ERR_FAIL_COND_V(err, ERR_CANT_CREATE);
+
+	print_line("New swapchain just dropped");
 
 	uint32_t sp_image_count;
 	err = fpGetSwapchainImagesKHR(device, window->swapchain, &sp_image_count, nullptr);

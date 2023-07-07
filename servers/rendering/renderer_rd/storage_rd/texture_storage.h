@@ -320,6 +320,7 @@ private:
 		Image::Format image_format = Image::FORMAT_L8;
 
 		bool is_transparent = false;
+		bool is_screen = false;
 
 		bool sdf_enabled = false;
 
@@ -474,6 +475,7 @@ public:
 	virtual void texture_proxy_update(RID p_proxy, RID p_base) override;
 
 	//these two APIs can be used together or in combination with the others.
+	void texture_2d_placeholder_initializef(RID p_texture, Image::Format p_format);
 	virtual void texture_2d_placeholder_initialize(RID p_texture) override;
 	virtual void texture_2d_layered_placeholder_initialize(RID p_texture, RenderingServer::TextureLayeredType p_layered_type) override;
 	virtual void texture_3d_placeholder_initialize(RID p_texture) override;
@@ -735,6 +737,9 @@ public:
 	RID render_target_get_override_depth_slice(RID p_render_target, const uint32_t p_layer) const;
 	virtual RID render_target_get_override_velocity(RID p_render_target) const override;
 	RID render_target_get_override_velocity_slice(RID p_render_target, const uint32_t p_layer) const;
+
+	virtual bool render_target_get_screen(RID p_render_target) const override;
+	virtual void render_target_set_screen(RID p_render_target, bool p_screen) override;
 
 	virtual RID render_target_get_texture(RID p_render_target) override;
 
