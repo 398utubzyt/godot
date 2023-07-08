@@ -1689,8 +1689,6 @@ Error VulkanContext::_window_create(DisplayServer::WindowID p_window_id, Display
 		ERR_FAIL_COND_V(err != OK, ERR_CANT_CREATE);
 	}
 
-	print_line("Creating new Vulkan window: %d", p_window_id);
-
 	Window window;
 	window.surface = p_surface;
 	window.width = p_width;
@@ -1970,8 +1968,6 @@ Error VulkanContext::_update_swap_chain(Window *window) {
 
 	err = fpCreateSwapchainKHR(device, &swapchain_ci, nullptr, &window->swapchain);
 	ERR_FAIL_COND_V(err, ERR_CANT_CREATE);
-
-	print_line("New swapchain just dropped");
 
 	uint32_t sp_image_count;
 	err = fpGetSwapchainImagesKHR(device, window->swapchain, &sp_image_count, nullptr);
