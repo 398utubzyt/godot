@@ -1213,6 +1213,15 @@ void TextureStorage::texture_proxy_update(RID p_texture, RID p_proxy_to) {
 	}
 }
 
+void TextureStorage::texture_2d_placeholder_initializef(RID p_texture, Image::Format p_format) {
+	//this could be better optimized to reuse an existing image , done this way
+	//for now to get it working
+	Ref<Image> image = Image::create_empty(4, 4, false, p_format);
+	image->fill(Color(1, 0, 1, 1));
+
+	texture_2d_initialize(p_texture, image);
+}
+
 //these two APIs can be used together or in combination with the others.
 void TextureStorage::texture_2d_placeholder_initialize(RID p_texture) {
 	//this could be better optimized to reuse an existing image , done this way
@@ -2574,9 +2583,11 @@ void TextureStorage::_update_render_target(RenderTarget *rt) {
 	if (rt->texture.is_null()) {
 		//create a placeholder until updated
 		rt->texture = texture_allocate();
-		texture_2d_placeholder_initialize(rt->texture);
+		
+		texture_2d_placeholder_initializef(rt->texture, rt->is_screen ? Image::FORMAT_RGBA8 : Image::FORMAT_RGBAH);
 		Texture *tex = get_texture(rt->texture);
 		tex->is_render_target = true;
+		
 	}
 
 	_clear_render_target(rt);
@@ -2585,9 +2596,17 @@ void TextureStorage::_update_render_target(RenderTarget *rt) {
 		return;
 	}
 	//until we implement support for HDR monitors (and render target is attached to screen), this is enough.
-	rt->color_format = RD::DATA_FORMAT_R8G8B8A8_UNORM;
-	rt->color_format_srgb = RD::DATA_FORMAT_R8G8B8A8_SRGB;
-	rt->image_format = rt->is_transparent ? Image::FORMAT_RGBA8 : Image::FORMAT_RGB8;
+	if (rt->is_screen)
+	{
+		rt->color_format = RD::DATA_FORMAT_R8G8B8A8_UNORM;
+		rt->color_format_srgb = RD::DATA_FORMAT_R8G8B8A8_SRGB;
+		rt->image_format = rt->is_transparent ? Image::FORMAT_RGBA8 : Image::FORMAT_RGB8;
+	} else {
+		rt->color_format = RD::DATA_FORMAT_R16G16B16A16_SFLOAT;
+		rt->color_format_srgb = RD::DATA_FORMAT_R8G8B8A8_SRGB;
+		rt->image_format = rt->is_transparent ? Image::FORMAT_RGBAH : Image::FORMAT_RGBH;
+	}
+	
 
 	RD::TextureFormat rd_color_attachment_format;
 	RD::TextureView rd_view;
@@ -2658,9 +2677,11 @@ void TextureStorage::_update_render_target(RenderTarget *rt) {
 			view.swizzle_a = RD::TEXTURE_SWIZZLE_ONE;
 		}
 		tex->rd_texture = RD::get_singleton()->texture_create_shared(view, rt->color);
-		if (rt->color_format_srgb != RD::DATA_FORMAT_MAX) {
-			view.format_override = rt->color_format_srgb;
-			tex->rd_texture_srgb = RD::get_singleton()->texture_create_shared(view, rt->color);
+		if (rt->is_screen) {
+			if (rt->color_format_srgb != RD::DATA_FORMAT_MAX) {
+				view.format_override = rt->color_format_srgb;
+				tex->rd_texture_srgb = RD::get_singleton()->texture_create_shared(view, rt->color);
+			}
 		}
 		tex->rd_view = view;
 		tex->width = rt->size.width;
@@ -2670,6 +2691,9 @@ void TextureStorage::_update_render_target(RenderTarget *rt) {
 		tex->rd_format = rt->color_format;
 		tex->rd_format_srgb = rt->color_format_srgb;
 		tex->format = rt->image_format;
+		if (rt->is_screen) {
+			tex->validated_format = Image::FORMAT_RGBAH;
+		}
 
 		Vector<RID> proxies = tex->proxies; //make a copy, since update may change it
 		for (int i = 0; i < proxies.size(); i++) {
@@ -2681,7 +2705,7 @@ void TextureStorage::_update_render_target(RenderTarget *rt) {
 void TextureStorage::_create_render_target_backbuffer(RenderTarget *rt) {
 	ERR_FAIL_COND(rt->backbuffer.is_valid());
 
-	uint32_t mipmaps_required = Image::get_image_required_mipmaps(rt->size.width, rt->size.height, Image::FORMAT_RGBA8);
+	uint32_t mipmaps_required = Image::get_image_required_mipmaps(rt->size.width, rt->size.height, rt->image_format);
 	RD::TextureFormat tf;
 	tf.format = rt->color_format;
 	tf.width = rt->size.width;
@@ -3455,4 +3479,16 @@ RID TextureStorage::render_target_get_vrs_texture(RID p_render_target) const {
 	ERR_FAIL_COND_V(!rt, RID());
 
 	return rt->vrs_texture;
+}
+
+void TextureStorage::render_target_set_screen(RID p_render_target, bool p_screen) {
+	RenderTarget *rt = render_target_owner.get_or_null(p_render_target);
+	ERR_FAIL_COND(!rt);
+	rt->is_screen = p_screen;
+}
+
+bool TextureStorage::render_target_get_screen(RID p_render_target) const {
+	RenderTarget *rt = render_target_owner.get_or_null(p_render_target);
+	ERR_FAIL_COND_V(!rt, false);
+	return rt->is_screen;
 }

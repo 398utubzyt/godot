@@ -280,7 +280,7 @@ godot_plugins_initialize_fn initialize_hostfxr_and_godot_plugins(bool &r_runtime
 	r_runtime_initialized = true;
 
 	print_verbose(".NET: hostfxr initialized");
-
+	
 	int rc = load_assembly_and_get_function_pointer(get_data(godot_plugins_path),
 			HOSTFXR_STR("GodotPlugins.Main, GodotPlugins"),
 			HOSTFXR_STR("InitializeFromEngine"),
@@ -288,7 +288,7 @@ godot_plugins_initialize_fn initialize_hostfxr_and_godot_plugins(bool &r_runtime
 			nullptr,
 			(void **)&godot_plugins_initialize);
 	ERR_FAIL_COND_V_MSG(rc != 0, nullptr, ".NET: Failed to get GodotPlugins initialization function pointer");
-
+	
 	return godot_plugins_initialize;
 }
 #else
@@ -314,7 +314,11 @@ godot_plugins_initialize_fn initialize_hostfxr_and_godot_plugins(bool &r_runtime
 			UNMANAGEDCALLERSONLY_METHOD,
 			nullptr,
 			(void **)&godot_plugins_initialize);
-	ERR_FAIL_COND_V_MSG(rc != 0, nullptr, ".NET: Failed to get GodotPlugins initialization function pointer");
+	ERR_FAIL_COND_V_MSG(rc != 0, nullptr,
+		vformat(".NET: Failed to get GodotPlugins initialization function pointer from:\n    Assembly: %s\n    Class: %s\n    Function: %s\n    Code: %X",
+			String(get_data(assembly_path)),
+			"GodotPlugins.Game.Main, " + assembly_name,
+			"InitializeFromGameProject", rc, rc & 255));
 
 	return godot_plugins_initialize;
 }
@@ -346,6 +350,8 @@ godot_plugins_initialize_fn try_load_native_aot_library(void *&r_aot_dll_handle)
 		err = OS::get_singleton()->get_dynamic_library_symbol_handle(lib, "godotsharp_game_main_init", symbol);
 		ERR_FAIL_COND_V(err != OK, nullptr);
 		return (godot_plugins_initialize_fn)symbol;
+	} else {
+		print_line("Could not find C# library at: " + native_aot_so_path);
 	}
 
 	return nullptr;

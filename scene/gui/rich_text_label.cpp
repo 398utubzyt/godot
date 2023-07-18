@@ -1066,21 +1066,19 @@ int RichTextLabel::_draw_line(ItemFrame *p_frame, int p_line, const Vector2 &p_o
 					ItemShake *item_shake = static_cast<ItemShake *>(item_fx);
 
 					if (!cn) {
-						uint64_t char_current_rand = item_shake->offset_random(glyphs[i].start);
-						uint64_t char_previous_rand = item_shake->offset_previous_random(glyphs[i].start);
-						uint64_t max_rand = 2147483647;
-						double current_offset = Math::remap(char_current_rand % max_rand, 0, max_rand, 0.0f, 2.f * (float)Math_PI);
-						double previous_offset = Math::remap(char_previous_rand % max_rand, 0, max_rand, 0.0f, 2.f * (float)Math_PI);
-						double n_time = (double)(item_shake->elapsed_time / (0.5f / item_shake->rate));
-						n_time = (n_time > 1.0) ? 1.0 : n_time;
-						item_shake->prev_off = Point2(Math::lerp(Math::sin(previous_offset), Math::sin(current_offset), n_time), Math::lerp(Math::cos(previous_offset), Math::cos(current_offset), n_time)) * (float)item_shake->strength / 10.0f;
+						uint32_t char_currentx = item_shake->offset_random_x(glyphs[i].start);
+						uint32_t char_currenty = item_shake->offset_random_y(glyphs[i].start);
+						uint32_t max_rand = 2147483647;
+						double offsetx = Math::remap(char_currentx % max_rand, 0, max_rand, 0.0f, 2.f * (float)Math_PI);
+						double offsety = Math::remap(char_currenty % max_rand, 0, max_rand, 0.0f, 2.f * (float)Math_PI);
+						item_shake->prev_off = Point2(offsetx, offsety) * (float)item_shake->strength / 10.0f;
 					}
 					fx_offset += item_shake->prev_off;
 				} else if (item_fx->type == ITEM_WAVE) {
 					ItemWave *item_wave = static_cast<ItemWave *>(item_fx);
 
 					if (!cn) {
-						double value = Math::sin(item_wave->frequency * item_wave->elapsed_time + ((p_ofs.x + gloff.x) / 50)) * (item_wave->amplitude / 10.0f);
+						double value = Math::sin(item_wave->speed * item_wave->elapsed_time + (item_wave->frequency * (p_ofs.x + gloff.x) / 50)) * (item_wave->amplitude / 10.0f);
 						item_wave->prev_off = Point2(0, 1) * value;
 					}
 					fx_offset += item_wave->prev_off;
@@ -1088,15 +1086,15 @@ int RichTextLabel::_draw_line(ItemFrame *p_frame, int p_line, const Vector2 &p_o
 					ItemTornado *item_tornado = static_cast<ItemTornado *>(item_fx);
 
 					if (!cn) {
-						double torn_x = Math::sin(item_tornado->frequency * item_tornado->elapsed_time + ((p_ofs.x + gloff.x) / 50)) * (item_tornado->radius);
-						double torn_y = Math::cos(item_tornado->frequency * item_tornado->elapsed_time + ((p_ofs.x + gloff.x) / 50)) * (item_tornado->radius);
+						double torn_x = Math::sin(item_tornado->speed * item_tornado->elapsed_time + (item_tornado->frequency * (p_ofs.x + gloff.x) / 50)) * (item_tornado->radius);
+						double torn_y = Math::cos(item_tornado->speed * item_tornado->elapsed_time + (item_tornado->frequency * (p_ofs.x + gloff.x) / 50)) * (item_tornado->radius);
 						item_tornado->prev_off = Point2(torn_x, torn_y);
 					}
 					fx_offset += item_tornado->prev_off;
 				} else if (item_fx->type == ITEM_RAINBOW) {
 					ItemRainbow *item_rainbow = static_cast<ItemRainbow *>(item_fx);
 
-					font_color = font_color.from_hsv(item_rainbow->frequency * (item_rainbow->elapsed_time + ((p_ofs.x + gloff.x) / 50)), item_rainbow->saturation, item_rainbow->value, font_color.a);
+					font_color = font_color.from_hsv(item_rainbow->speed * item_rainbow->elapsed_time + (item_rainbow->frequency * (p_ofs.x + gloff.x) / 50), item_rainbow->saturation, item_rainbow->value, font_color.a);
 				}
 			}
 
@@ -1284,21 +1282,19 @@ int RichTextLabel::_draw_line(ItemFrame *p_frame, int p_line, const Vector2 &p_o
 					ItemShake *item_shake = static_cast<ItemShake *>(item_fx);
 
 					if (!cn) {
-						uint64_t char_current_rand = item_shake->offset_random(glyphs[i].start);
-						uint64_t char_previous_rand = item_shake->offset_previous_random(glyphs[i].start);
-						uint64_t max_rand = 2147483647;
-						double current_offset = Math::remap(char_current_rand % max_rand, 0, max_rand, 0.0f, 2.f * (float)Math_PI);
-						double previous_offset = Math::remap(char_previous_rand % max_rand, 0, max_rand, 0.0f, 2.f * (float)Math_PI);
-						double n_time = (double)(item_shake->elapsed_time / (0.5f / item_shake->rate));
-						n_time = (n_time > 1.0) ? 1.0 : n_time;
-						item_shake->prev_off = Point2(Math::lerp(Math::sin(previous_offset), Math::sin(current_offset), n_time), Math::lerp(Math::cos(previous_offset), Math::cos(current_offset), n_time)) * (float)item_shake->strength / 10.0f;
+						uint32_t char_currentx = item_shake->offset_random_x(glyphs[i].start);
+						uint32_t char_currenty = item_shake->offset_random_y(glyphs[i].start);
+						uint32_t max_rand = 2147483647;
+						double offsetx = Math::remap(char_currentx % max_rand, 0, max_rand, -1.0f, 1.0f);
+						double offsety = Math::remap(char_currenty % max_rand, 0, max_rand, -1.0f, 1.0f);
+						item_shake->prev_off = Point2(offsetx, offsety) * (float)item_shake->strength / 10.0f;
 					}
 					fx_offset += item_shake->prev_off;
 				} else if (item_fx->type == ITEM_WAVE) {
 					ItemWave *item_wave = static_cast<ItemWave *>(item_fx);
 
 					if (!cn) {
-						double value = Math::sin(item_wave->frequency * item_wave->elapsed_time + ((p_ofs.x + off.x) / 50)) * (item_wave->amplitude / 10.0f);
+						double value = Math::sin(item_wave->speed * item_wave->elapsed_time + (item_wave->frequency * (p_ofs.x + off.x) / 50)) * (item_wave->amplitude / 10.0f);
 						item_wave->prev_off = Point2(0, 1) * value;
 					}
 					fx_offset += item_wave->prev_off;
@@ -1306,15 +1302,15 @@ int RichTextLabel::_draw_line(ItemFrame *p_frame, int p_line, const Vector2 &p_o
 					ItemTornado *item_tornado = static_cast<ItemTornado *>(item_fx);
 
 					if (!cn) {
-						double torn_x = Math::sin(item_tornado->frequency * item_tornado->elapsed_time + ((p_ofs.x + off.x) / 50)) * (item_tornado->radius);
-						double torn_y = Math::cos(item_tornado->frequency * item_tornado->elapsed_time + ((p_ofs.x + off.x) / 50)) * (item_tornado->radius);
+						double torn_x = Math::sin(item_tornado->frequency * item_tornado->elapsed_time + (item_tornado->frequency * (p_ofs.x + off.x) / 50)) * (item_tornado->radius);
+						double torn_y = Math::cos(item_tornado->frequency * item_tornado->elapsed_time + (item_tornado->frequency * (p_ofs.x + off.x) / 50)) * (item_tornado->radius);
 						item_tornado->prev_off = Point2(torn_x, torn_y);
 					}
 					fx_offset += item_tornado->prev_off;
 				} else if (item_fx->type == ITEM_RAINBOW) {
 					ItemRainbow *item_rainbow = static_cast<ItemRainbow *>(item_fx);
 
-					font_color = font_color.from_hsv(item_rainbow->frequency * (item_rainbow->elapsed_time + ((p_ofs.x + off.x) / 50)), item_rainbow->saturation, item_rainbow->value, font_color.a);
+					font_color = font_color.from_hsv(item_rainbow->speed * item_rainbow->elapsed_time + (item_rainbow->frequency * (p_ofs.x + off.x) / 50), item_rainbow->saturation, item_rainbow->value, font_color.a);
 				}
 			}
 
@@ -1693,8 +1689,7 @@ void RichTextLabel::_update_fx(RichTextLabel::ItemFrame *p_frame, double p_delta
 		}
 
 		if (shake) {
-			bool cycle = (shake->elapsed_time > (1.0f / shake->rate));
-			if (cycle) {
+			if (shake->elapsed_time > (1.0f / shake->rate)) {
 				shake->elapsed_time -= (1.0f / shake->rate);
 				shake->reroll_random();
 			}
@@ -3461,29 +3456,31 @@ void RichTextLabel::push_shake(int p_strength = 10, float p_rate = 24.0f, bool p
 	_add_item(item, true);
 }
 
-void RichTextLabel::push_wave(float p_frequency = 1.0f, float p_amplitude = 10.0f, bool p_connected = true) {
+void RichTextLabel::push_wave(float p_frequency = 1.0f, float p_speed = 1.0f, float p_amplitude = 10.0f, bool p_connected = true) {
 	_stop_thread();
 	MutexLock data_lock(data_mutex);
 
 	ItemWave *item = memnew(ItemWave);
 	item->frequency = p_frequency;
+	item->speed = p_speed;
 	item->amplitude = p_amplitude;
 	item->connected = p_connected;
 	_add_item(item, true);
 }
 
-void RichTextLabel::push_tornado(float p_frequency = 1.0f, float p_radius = 10.0f, bool p_connected = true) {
+void RichTextLabel::push_tornado(float p_frequency = 1.0f, float p_speed = 1.0f, float p_radius = 10.0f, bool p_connected = true) {
 	_stop_thread();
 	MutexLock data_lock(data_mutex);
 
 	ItemTornado *item = memnew(ItemTornado);
 	item->frequency = p_frequency;
+	item->speed = p_speed;
 	item->radius = p_radius;
 	item->connected = p_connected;
 	_add_item(item, true);
 }
 
-void RichTextLabel::push_rainbow(float p_saturation, float p_value, float p_frequency) {
+void RichTextLabel::push_rainbow(float p_saturation, float p_value, float p_frequency, float p_speed) {
 	_stop_thread();
 	MutexLock data_lock(data_mutex);
 
@@ -3491,6 +3488,7 @@ void RichTextLabel::push_rainbow(float p_saturation, float p_value, float p_freq
 	item->frequency = p_frequency;
 	item->saturation = p_saturation;
 	item->value = p_value;
+	item->speed = p_speed;
 	_add_item(item, true);
 }
 
@@ -4621,13 +4619,19 @@ void RichTextLabel::append_text(const String &p_bbcode) {
 				period = period_option->value.to_float();
 			}
 
+			float speed = 1.0f;
+			OptionMap::Iterator speed_option = bbcode_options.find("speed");
+			if (speed_option) {
+				speed = speed_option->value.to_float();
+			}
+
 			bool connected = true;
 			OptionMap::Iterator connected_option = bbcode_options.find("connected");
 			if (connected_option) {
 				connected = connected_option->value.to_int();
 			}
 
-			push_wave(period, amplitude, connected);
+			push_wave(period, speed, amplitude, connected);
 			pos = brk_end + 1;
 			tag_stack.push_front("wave");
 			set_process_internal(true);
@@ -4644,13 +4648,19 @@ void RichTextLabel::append_text(const String &p_bbcode) {
 				frequency = frequency_option->value.to_float();
 			}
 
+			float speed = 1.0f;
+			OptionMap::Iterator speed_option = bbcode_options.find("speed");
+			if (speed_option) {
+				speed = speed_option->value.to_float();
+			}
+
 			bool connected = true;
 			OptionMap::Iterator connected_option = bbcode_options.find("connected");
 			if (connected_option) {
 				connected = connected_option->value.to_int();
 			}
 
-			push_tornado(frequency, radius, connected);
+			push_tornado(frequency, speed, radius, connected);
 			pos = brk_end + 1;
 			tag_stack.push_front("tornado");
 			set_process_internal(true);
@@ -4673,7 +4683,13 @@ void RichTextLabel::append_text(const String &p_bbcode) {
 				frequency = frequency_option->value.to_float();
 			}
 
-			push_rainbow(saturation, value, frequency);
+			float speed = 1.0f;
+			OptionMap::Iterator speed_option = bbcode_options.find("speed");
+			if (speed_option) {
+				speed = speed_option->value.to_float();
+			}
+
+			push_rainbow(saturation, value, frequency, speed);
 			pos = brk_end + 1;
 			tag_stack.push_front("rainbow");
 			set_process_internal(true);

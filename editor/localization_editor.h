@@ -59,6 +59,7 @@ class LocalizationEditor : public VBoxContainer {
 	bool updating_translations = false;
 	String localization_changed;
 
+	void _translation_file_open_refresh();
 	void _translation_file_open();
 	void _translation_add(const PackedStringArray &p_paths);
 	void _translation_delete(Object *p_item, int p_column, int p_button, MouseButton p_mouse_button);

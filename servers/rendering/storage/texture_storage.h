@@ -170,6 +170,9 @@ public:
 	virtual RID render_target_get_override_depth(RID p_render_target) const = 0;
 	virtual RID render_target_get_override_velocity(RID p_render_target) const = 0;
 
+	virtual bool render_target_get_screen(RID p_render_target) const = 0;
+	virtual void render_target_set_screen(RID p_render_target, bool p_screen) = 0;
+
 	// get textures
 	virtual RID render_target_get_texture(RID p_render_target) = 0;
 };

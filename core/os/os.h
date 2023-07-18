@@ -151,6 +151,7 @@ public:
 	virtual void close_midi_inputs();
 
 	virtual void alert(const String &p_alert, const String &p_title = "ALERT!");
+	virtual Error popup(const String &p_title, const String &p_message, const List<String> &p_buttons, int *r_pressed = nullptr) { return ERR_UNAVAILABLE; }
 
 	virtual Error open_dynamic_library(const String p_path, void *&p_library_handle, bool p_also_set_library_path = false, String *r_resolved_path = nullptr) { return ERR_UNAVAILABLE; }
 	virtual Error close_dynamic_library(void *p_library_handle) { return ERR_UNAVAILABLE; }

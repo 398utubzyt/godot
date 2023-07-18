@@ -154,6 +154,7 @@ protected:
 
 public:
 	virtual void alert(const String &p_alert, const String &p_title = "ALERT!") override;
+	virtual Error popup(const String &p_title, const String &p_message, const List<String> &p_buttons, int *r_pressed = nullptr) override;
 
 	virtual Error get_entropy(uint8_t *r_buffer, int p_bytes) override;
 

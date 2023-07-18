@@ -297,31 +297,32 @@ private:
 	struct ItemShake : public ItemFX {
 		int strength = 0;
 		float rate = 0.0f;
-		uint64_t _current_rng = 0;
-		uint64_t _previous_rng = 0;
+		uint32_t _x_rng = 0;
+		uint32_t _y_rng = 0;
 		Vector2 prev_off;
 
 		ItemShake() { type = ITEM_SHAKE; }
 
 		void reroll_random() {
-			_previous_rng = _current_rng;
-			_current_rng = Math::rand();
+			_x_rng = Math::rand();
+			_y_rng = Math::rand();
 		}
 
-		uint64_t offset_random(int p_index) {
-			return (_current_rng >> (p_index % 64)) |
-					(_current_rng << (64 - (p_index % 64)));
+		uint32_t offset_random_x(int p_index) {
+			return (_x_rng >> (p_index % 32)) |
+					(_x_rng << (32 - (p_index % 32)));
 		}
 
-		uint64_t offset_previous_random(int p_index) {
-			return (_previous_rng >> (p_index % 64)) |
-					(_previous_rng << (64 - (p_index % 64)));
+		uint32_t offset_random_y(int p_index) {
+			return (_y_rng >> (p_index % 32)) |
+					(_y_rng << (32 - (p_index % 32)));
 		}
 	};
 
 	struct ItemWave : public ItemFX {
 		float frequency = 1.0f;
 		float amplitude = 1.0f;
+		float speed = 1.0f;
 		Vector2 prev_off;
 
 		ItemWave() { type = ITEM_WAVE; }
@@ -330,6 +331,7 @@ private:
 	struct ItemTornado : public ItemFX {
 		float radius = 1.0f;
 		float frequency = 1.0f;
+		float speed = 1.0f;
 		Vector2 prev_off;
 
 		ItemTornado() { type = ITEM_TORNADO; }
@@ -339,6 +341,7 @@ private:
 		float saturation = 0.8f;
 		float value = 0.8f;
 		float frequency = 1.0f;
+		float speed = 1.0f;
 
 		ItemRainbow() { type = ITEM_RAINBOW; }
 	};
@@ -608,9 +611,9 @@ public:
 	void push_table(int p_columns, InlineAlignment p_alignment = INLINE_ALIGNMENT_TOP, int p_align_to_row = -1);
 	void push_fade(int p_start_index, int p_length);
 	void push_shake(int p_strength, float p_rate, bool p_connected);
-	void push_wave(float p_frequency, float p_amplitude, bool p_connected);
-	void push_tornado(float p_frequency, float p_radius, bool p_connected);
-	void push_rainbow(float p_saturation, float p_value, float p_frequency);
+	void push_wave(float p_frequency, float p_speed, float p_amplitude, bool p_connected);
+	void push_tornado(float p_frequency, float p_speed, float p_radius, bool p_connected);
+	void push_rainbow(float p_saturation, float p_value, float p_frequency, float p_speed);
 	void push_bgcolor(const Color &p_color);
 	void push_fgcolor(const Color &p_color);
 	void push_customfx(Ref<RichTextEffect> p_custom_effect, Dictionary p_environment);

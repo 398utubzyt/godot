@@ -46,11 +46,7 @@ void LocalizationEditor::_notification(int p_what) {
 			translation_list->connect("button_clicked", callable_mp(this, &LocalizationEditor::_translation_delete));
 			translation_pot_list->connect("button_clicked", callable_mp(this, &LocalizationEditor::_pot_delete));
 
-			List<String> tfn;
-			ResourceLoader::get_recognized_extensions_for_type("Translation", &tfn);
-			for (const String &E : tfn) {
-				translation_file_open->add_filter("*." + E);
-			}
+			_translation_file_open_refresh();
 
 			List<String> rfn;
 			ResourceLoader::get_recognized_extensions_for_type("Resource", &rfn);
@@ -91,7 +87,17 @@ void LocalizationEditor::_translation_add(const PackedStringArray &p_paths) {
 	undo_redo->commit_action();
 }
 
+void LocalizationEditor::_translation_file_open_refresh() {
+	translation_file_open->clear_filters();
+	List<String> tfn;
+	ResourceLoader::get_recognized_extensions_for_type("Translation", &tfn);
+	for (const String &E : tfn) {
+		translation_file_open->add_filter("*." + E);
+	}
+}
+
 void LocalizationEditor::_translation_file_open() {
+	_translation_file_open_refresh();
 	translation_file_open->popup_file_dialog();
 }
 

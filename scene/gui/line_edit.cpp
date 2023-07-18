@@ -476,6 +476,8 @@ void LineEdit::gui_input(const Ref<InputEvent> &p_event) {
 			if (DisplayServer::get_singleton()->has_feature(DisplayServer::FEATURE_VIRTUAL_KEYBOARD) && virtual_keyboard_enabled) {
 				DisplayServer::get_singleton()->virtual_keyboard_hide();
 			}
+			if (get_automatically_lose_focus())
+				release_focus();
 			accept_event();
 			return;
 		}

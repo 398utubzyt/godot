@@ -362,6 +362,7 @@ struct RenderTarget {
 	bool sdf_enabled = false;
 
 	bool is_transparent = false;
+	bool is_screen = false;
 	bool direct_to_screen = false;
 
 	bool used_in_frame = false;
@@ -652,6 +653,9 @@ public:
 	virtual RID render_target_get_override_color(RID p_render_target) const override;
 	virtual RID render_target_get_override_depth(RID p_render_target) const override;
 	virtual RID render_target_get_override_velocity(RID p_render_target) const override;
+
+	virtual bool render_target_get_screen(RID p_render_target) const override;
+	virtual void render_target_set_screen(RID p_render_target, bool p_screen) override;
 
 	virtual RID render_target_get_texture(RID p_render_target) override;
 

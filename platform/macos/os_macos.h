@@ -84,6 +84,7 @@ public:
 	virtual String get_version() const override;
 
 	virtual void alert(const String &p_alert, const String &p_title = "ALERT!") override;
+	virtual Error popup(const String &p_title, const String &p_message, const List<String> &p_buttons, int *r_pressed = nullptr) override;
 
 	virtual Error open_dynamic_library(const String p_path, void *&p_library_handle, bool p_also_set_library_path = false, String *r_resolved_path = nullptr) override;
 

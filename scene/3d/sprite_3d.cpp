@@ -629,6 +629,7 @@ SpriteBase3D::SpriteBase3D() {
 	RS::get_singleton()->material_set_param(material, "uv1_scale", Vector3(1, 1, 1));
 	RS::get_singleton()->material_set_param(material, "uv2_offset", Vector3(0, 0, 0));
 	RS::get_singleton()->material_set_param(material, "uv2_scale", Vector3(1, 1, 1));
+	RS::get_singleton()->material_set_param(material, "texture_repeat", false);
 
 	mesh = RenderingServer::get_singleton()->mesh_create();
 
@@ -934,7 +935,7 @@ void AnimatedSprite3D::_draw() {
 	}
 
 	Rect2 dst_rect(ofs, tsize);
-
+	
 	draw_texture_rect(texture, dst_rect, src_rect);
 }
 

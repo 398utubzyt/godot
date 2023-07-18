@@ -153,6 +153,27 @@ void OS_MacOS::alert(const String &p_alert, const String &p_title) {
 	}
 }
 
+Error OS_MacOS::popup(const String &p_title, const String &p_message, const List<String> &p_buttons, int *r_pressed = nullptr) {
+	NSAlert *window [[NSAlert alloc] init];
+	NSString *ns_title = [NSString stringWithUTF8String:p_title.utf8().get_data()];
+	NSString *ns_message = [NSString stringWithUTF8String:p_message.utf8().get_data()];
+	NSString **ns_buttons = [NSString* alloc];
+
+	NSTextField *text_field = [NSTextField labelWithString:ns_alert];
+	[text_field setAlignment:NSTextAlignmentCenter];
+	for (int i = 0; i < p_buttons.count; i++)
+		[window addButtonWithTitle:[NSString stringWithUTF8String:p_buttons[i].utf8().get_data()]];
+	[window setMessageText:ns_title];
+	[window setAccessoryView:text_field];
+	[window setAlertStyle:NSAlertStyleWarning];
+
+	id key_window = [[NSApplication sharedApplication] keyWindow];
+	[window runModal];
+	if (key_window) {
+		[key_window makeKeyAndOrderFront:nil];
+	}
+}
+
 _FORCE_INLINE_ String OS_MacOS::get_framework_executable(const String &p_path) {
 	Ref<DirAccess> da = DirAccess::create(DirAccess::ACCESS_FILESYSTEM);
 

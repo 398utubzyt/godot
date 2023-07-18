@@ -555,7 +555,7 @@ public:
 		TextureSamples samples;
 		uint32_t usage_flags;
 		AttachmentFormat() {
-			format = DATA_FORMAT_R8G8B8A8_UNORM;
+			format = DATA_FORMAT_R16G16B16A16_SFLOAT;
 			samples = TEXTURE_SAMPLES_1;
 			usage_flags = 0;
 		}

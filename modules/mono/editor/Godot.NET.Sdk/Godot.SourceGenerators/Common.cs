@@ -384,5 +384,65 @@ namespace Godot.SourceGenerators
                 typeArgumentSyntax.GetLocation(),
                 typeArgumentSyntax.SyntaxTree.FilePath));
         }
+
+        public static readonly DiagnosticDescriptor GlobalClassMustDeriveFromGodotObjectRule =
+            new DiagnosticDescriptor(id: "GD0401",
+                title: "The class must derive from the Godot.GodotObject or a derived child class",
+                messageFormat: "The class must inherit Godot.GodotObject: {0}",
+                category: "Usage",
+                DiagnosticSeverity.Error,
+                isEnabledByDefault: true,
+                "The class must be a valid Godot-compatible type. Derive from GodotObject or other child classes such as Node or Resource.");
+
+        public static void ReportGlobalClassMustDeriveFromGodotObject(
+            SyntaxNodeAnalysisContext context,
+            SyntaxNode classSyntax,
+            ISymbol typeSymbol)
+        {
+            string message = $"The class '{typeSymbol.ToDisplayString()}' must derive from the Godot.GodotObject or a derived child class";
+
+            string description = $"{message}. Derive from GodotObject or other child classes such as Node or Resource.";
+
+            context.ReportDiagnostic(Diagnostic.Create(
+                new DiagnosticDescriptor(id: "GD0401",
+                    title: message,
+                    messageFormat: message,
+                    category: "Usage",
+                    DiagnosticSeverity.Error,
+                    isEnabledByDefault: true,
+                    description),
+                classSyntax.GetLocation(),
+                classSyntax.SyntaxTree.FilePath));
+        }
+
+        public static readonly DiagnosticDescriptor GlobalClassMustNotBeGenericRule =
+            new DiagnosticDescriptor(id: "GD0402",
+                title: "The class must not contain generic arguments",
+                messageFormat: "The class must not be generic: {0}",
+                category: "Usage",
+                DiagnosticSeverity.Error,
+                isEnabledByDefault: true,
+                "The class must be a non-generic type. Remove the generic arguments and inherit a non-global generic class.");
+
+        public static void ReportGlobalClassMustNotBeGeneric(
+            SyntaxNodeAnalysisContext context,
+            SyntaxNode classSyntax,
+            ISymbol typeSymbol)
+        {
+            string message = $"The class '{typeSymbol.ToDisplayString()}' must not contain any generic arguments";
+
+            string description = $"{message}. Inheriting a non-global generic class is acceptable.";
+
+            context.ReportDiagnostic(Diagnostic.Create(
+                new DiagnosticDescriptor(id: "GD0402",
+                    title: message,
+                    messageFormat: message,
+                    category: "Usage",
+                    DiagnosticSeverity.Error,
+                    isEnabledByDefault: true,
+                    description),
+                classSyntax.GetLocation(),
+                classSyntax.SyntaxTree.FilePath));
+        }
     }
 }

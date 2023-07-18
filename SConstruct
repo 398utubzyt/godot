@@ -566,7 +566,6 @@ if selected_platform in platform_list:
     if env.msvc:
         if env["debug_symbols"]:
             env.Append(CCFLAGS=["/Zi", "/FS"])
-            env.Append(LINKFLAGS=["/DEBUG:FULL"])
 
         if env["optimize"] == "speed":
             env.Append(CCFLAGS=["/O2"])
@@ -579,6 +578,8 @@ if selected_platform in platform_list:
             env.Append(LINKFLAGS=["/OPT:REF"])
         elif env["optimize"] == "debug" or env["optimize"] == "none":
             env.Append(CCFLAGS=["/Od"])
+
+        env.Append(LINKFLAGS=["/MANIFEST:EMBED"])
     else:
         if env["debug_symbols"]:
             # Adding dwarf-4 explicitly makes stacktraces work with clang builds,

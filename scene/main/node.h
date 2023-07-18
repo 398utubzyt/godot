@@ -600,6 +600,7 @@ public:
 	bool is_enabled() const;
 	bool is_ready() const;
 
+	bool is_ready() const;
 	void request_ready();
 
 	void set_process_thread_group(ProcessThreadGroup p_mode);

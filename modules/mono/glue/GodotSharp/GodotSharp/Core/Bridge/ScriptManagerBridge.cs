@@ -131,6 +131,9 @@ namespace Godot.Bridge
                 // Performance is not critical here as this will be replaced with source generators.
                 Type scriptType = _scriptTypeBiMap.GetScriptType(scriptPtr);
 
+                if (scriptType.IsAbstract)
+                    return godot_bool.False;
+
                 var ctor = scriptType
                     .GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
                     .Where(c => c.GetParameters().Length == argCount)
@@ -146,7 +149,7 @@ namespace Godot.Bridge
                     else
                     {
                         throw new MissingMemberException(
-                            $"The class '{scriptType.FullName}' does not define a constructor that takes x parameters.");
+                            $"The class '{scriptType.FullName}' does not define a constructor that takes {argCount} parameters.");
                     }
                 }
 
@@ -592,7 +595,7 @@ namespace Godot.Bridge
 
         [UnmanagedCallersOnly]
         internal static unsafe void UpdateScriptClassInfo(IntPtr scriptPtr, godot_string* outClassName,
-            godot_bool* outTool, godot_bool* outGlobal, godot_string* outIconPath,
+            godot_bool* outTool, godot_bool* outGlobal, godot_bool* outAbstract, godot_string* outIconPath,
             godot_array* outMethodsDest, godot_dictionary* outRpcFunctionsDest,
             godot_dictionary* outEventSignalsDest, godot_ref* outBaseScript)
         {
@@ -622,6 +625,7 @@ namespace Godot.Bridge
                     .FirstOrDefault();
 
                 *outGlobal = (globalAttr != null).ToGodotBool();
+                *outAbstract = scriptType.IsAbstract.ToGodotBool();
 
                 var iconAttr = scriptType.GetCustomAttributes(inherit: false)
                     .OfType<IconAttribute>()
@@ -792,6 +796,7 @@ namespace Godot.Bridge
                 *outClassName = default;
                 *outTool = godot_bool.False;
                 *outGlobal = godot_bool.False;
+                *outAbstract = godot_bool.False;
                 *outIconPath = default;
                 *outMethodsDest = NativeFuncs.godotsharp_array_new();
                 *outRpcFunctionsDest = NativeFuncs.godotsharp_dictionary_new();
