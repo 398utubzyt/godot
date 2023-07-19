@@ -598,7 +598,6 @@ public:
 	bool can_process() const;
 	bool can_process_notification(int p_what) const;
 	bool is_enabled() const;
-	bool is_ready() const;
 
 	bool is_ready() const;
 	void request_ready();
