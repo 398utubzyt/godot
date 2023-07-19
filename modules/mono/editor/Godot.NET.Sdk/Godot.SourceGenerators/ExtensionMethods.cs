@@ -244,9 +244,6 @@ namespace Godot.SourceGenerators
         public static bool IsGodotGlobalClassAttribute(this INamedTypeSymbol symbol)
             => symbol.FullQualifiedNameOmitGlobal() == GodotClasses.GlobalClassAttr;
 
-        public static bool IsGodotGlobalClassAttribute(this INamedTypeSymbol symbol)
-            => symbol.ToString() == GodotClasses.GlobalClassAttr;
-
         public static bool IsSystemFlagsAttribute(this INamedTypeSymbol symbol)
             => symbol.FullQualifiedNameOmitGlobal() == GodotClasses.SystemFlagsAttr;
 
