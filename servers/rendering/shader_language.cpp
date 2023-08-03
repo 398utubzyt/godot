@@ -8815,10 +8815,6 @@ Error ShaderLanguage::_parse_shader(const HashMap<StringName, FunctionInfo> &p_f
 										_set_error(vformat(RTR("'hint_normal_roughness_texture' is not supported in '%s' shaders."), shader_type_identifier));
 										return ERR_PARSE_ERROR;
 									}
-									if (String(shader_type_identifier) != "spatial") {
-										_set_error(vformat(RTR("'hint_normal_roughness_texture' is not supported in '%s' shaders."), shader_type_identifier));
-										return ERR_PARSE_ERROR;
-									}
 								} break;
 								case TK_HINT_DEPTH_TEXTURE: {
 									new_hint = ShaderNode::Uniform::HINT_DEPTH_TEXTURE;

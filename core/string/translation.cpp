@@ -103,7 +103,7 @@ void Translation::set_locale(const String &p_locale) {
 
 
 bool Translation::can_add(const StringName &p_key, const Variant &p_text, const StringName &p_context) const {
-	if (p_text.is_null())
+	if (p_text.get_type() == Variant::OBJECT && p_text.is_null())
 		return false;
 
 	bool ret;
