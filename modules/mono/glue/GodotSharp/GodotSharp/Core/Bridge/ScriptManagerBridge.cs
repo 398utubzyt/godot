@@ -132,7 +132,7 @@ namespace Godot.Bridge
                 // Performance is not critical here as this will be replaced with source generators.
                 Type scriptType = _scriptTypeBiMap.GetScriptType(scriptPtr);
 
-                Debug.Assert(scriptType.IsAbstract, $"Cannot create script instance. The class '{scriptType.FullName}' is abstract.");
+                Debug.Assert(!scriptType.IsAbstract, $"Cannot create script instance. The class '{scriptType.FullName}' is abstract.");
 
                 var ctor = scriptType
                     .GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
