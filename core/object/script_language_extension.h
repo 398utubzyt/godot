@@ -102,7 +102,6 @@ public:
 
 	EXBIND0RC(bool, is_tool)
 	EXBIND0RC(bool, is_valid)
-	EXBIND0RC(bool, is_abstract)
 
 	virtual bool is_abstract() const override {
 		bool abst;
