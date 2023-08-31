@@ -380,7 +380,7 @@ bool ClassDB::can_instantiate(const StringName &p_class) {
 	ClassInfo *ti = classes.getptr(p_class);
 	if (!ti) {
 		if (!ScriptServer::is_global_class(p_class)) {
-			ERR_FAIL_COND_V_MSG(!ti, false, "Cannot get class '" + String(p_class) + "'.");
+			ERR_FAIL_V_MSG(false, "Cannot get class '" + String(p_class) + "'.");
 		}
 		String path = ScriptServer::get_global_class_path(p_class);
 		Ref<Script> scr = ResourceLoader::load(path);
