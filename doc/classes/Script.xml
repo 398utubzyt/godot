@@ -84,8 +84,7 @@
 		<method name="is_abstract" qualifiers="const">
 			<return type="bool" />
 			<description>
-				Returns [code]true[/code] if the script is an abstract script.
-				An abstract script does not have a constructor and cannot be instantiated.
+				Returns [code]true[/code] if the script is an abstract script. An abstract script does not have a constructor and cannot be instantiated.
 			</description>
 		</method>
 		<method name="is_tool" qualifiers="const">
