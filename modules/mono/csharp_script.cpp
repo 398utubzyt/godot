@@ -554,7 +554,7 @@ String CSharpLanguage::get_global_class_name(const String &p_path, String *r_bas
 	// Always assign r_base_type and r_icon_path, even if the script
 	// is not a global one. In the case that it is not a global script,
 	// return an empty string AFTER assigning the return parameters.
-	// See modules/gdscript/gdscript.cpp:2499
+	// See GDScriptLanguage::get_global_class_name() in modules/gdscript/gdscript.cpp
 
 	if (!scr.is_valid() || !scr->valid) {
 		// Invalid script.
