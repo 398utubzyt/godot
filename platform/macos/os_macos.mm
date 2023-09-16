@@ -179,6 +179,8 @@ Error OS_MacOS::popup(const String &p_title, const String &p_message, const List
 	if (key_window) {
 		[key_window makeKeyAndOrderFront:nil];
 	}
+
+	return OK;
 }
 
 _FORCE_INLINE_ String OS_MacOS::get_framework_executable(const String &p_path) {
