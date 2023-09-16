@@ -158,7 +158,7 @@ Error OS_MacOS::popup(const String &p_title, const String &p_message, const List
 	NSString *ns_title = [NSString stringWithUTF8String:p_title.utf8().get_data()];
 	NSString *ns_message = [NSString stringWithUTF8String:p_message.utf8().get_data()];
 
-	List<Char8String> buttons;
+	List<CharString> buttons;
 	for (String s : p_buttons)
 		buttons.push_back(s.utf8());
 
