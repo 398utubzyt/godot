@@ -104,15 +104,15 @@ Ref<Resource> TranslationLoaderPO::load_translation(Ref<FileAccess> f, Error *r_
 				data.write[str_len] = 0;
 
 				if (!msg_id.is_empty()) {
-				/*	config = String::utf8((const char *)data.ptr(), str_len);
-					// Record plural rule.
-					int p_start = config.find("Plural-Forms");
-					if (p_start != -1) {
-						int p_end = config.find("\n", p_start);
-						// TODO: Plural rules?
-						//translation->set_plural_rule(config.substr(p_start, p_end - p_start));
-					}
-				} else { */
+					/*	config = String::utf8((const char *)data.ptr(), str_len);
+						// Record plural rule.
+						int p_start = config.find("Plural-Forms");
+						if (p_start != -1) {
+							int p_end = config.find("\n", p_start);
+							// TODO: Plural rules?
+							//translation->set_plural_rule(config.substr(p_start, p_end - p_start));
+						}
+					} else { */
 					uint32_t str_start = 0;
 					Array plural_msg;
 					for (uint32_t j = 0; j < str_len + 1; j++) {
