@@ -56,8 +56,7 @@ Vector<String> Translation::_get_message_list() const {
 	msgs.resize(translation_map.size());
 	int idx = 0;
 	for (const KeyValue<StringName, HashMap<StringName, Variant>> &E : translation_map) {
-		for (const KeyValue<StringName, Variant>& E2 : E.value)
-		{
+		for (const KeyValue<StringName, Variant>& E2 : E.value) {
 			msgs.set(idx, E2.key);
 			idx += 1;
 		}
@@ -129,7 +128,7 @@ Variant Translation::get_message(const StringName &p_key, const StringName &p_co
 	if (GDVIRTUAL_CALL(_get_message, p_key, p_context, ret)) {
 		return ret;
 	}
-	
+
 	HashMap<StringName, HashMap<StringName, Variant>>::ConstIterator E = translation_map.find(p_key);
 	if (!E) {
 		return Variant();
@@ -575,8 +574,7 @@ bool TranslationServer::has_locale(const String& p_locale) const
 
 void TranslationServer::add_translation(const Ref<Translation> &p_translation) {
 	String trlocale = p_translation->get_locale();
-	if (!has_locale(trlocale))
-	{
+	if (!has_locale(trlocale)) {
 		Vector<Ref<Translation>> vec;
 		vec.push_back(p_translation);
 		translations.insert(trlocale, vec);
@@ -642,7 +640,7 @@ int TranslationServer::get_translation_object_count(const String &p_locale) cons
 	return res;
 }
 
-Ref<Translation> TranslationServer::get_translation_object_at(const String& p_locale, int p_index) const {
+Ref<Translation> TranslationServer::get_translation_object_at(const String &p_locale, int p_index) const {
 	Ref<Translation> res;
 	int best_score = 0;
 
