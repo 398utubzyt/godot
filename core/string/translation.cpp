@@ -166,8 +166,8 @@ void Translation::erase_message(const StringName &p_key, const StringName &p_con
 
 void Translation::get_message_list(List<StringName> *r_messages) const {
 	for (const KeyValue<StringName, HashMap<StringName, Variant>> &E : translation_map) {
-		const StringName &name = E.key;
-		r_messages->push_back(name);
+		const StringName &key = E.key;
+		r_messages->push_back(key);
 	}
 }
 
@@ -574,29 +574,29 @@ bool TranslationServer::has_locale(const String& p_locale) const
 }
 
 void TranslationServer::add_translation(const Ref<Translation> &p_translation) {
-	String locale = p_translation->get_locale();
-	if (!has_locale(locale))
+	String trlocale = p_translation->get_locale();
+	if (!has_locale(trlocale))
 	{
 		Vector<Ref<Translation>> vec;
 		vec.push_back(p_translation);
-		translations.insert(locale, vec);
+		translations.insert(trlocale, vec);
 		return;
 	}
 
-	translations.get(locale).push_back(p_translation);
+	translations.get(trlocale).push_back(p_translation);
 }
 
 void TranslationServer::remove_translation(const Ref<Translation> &p_translation) {
-	String locale = p_translation->get_locale();
-	ERR_FAIL_COND(!has_locale(locale));
+	String trlocale = p_translation->get_locale();
+	ERR_FAIL_COND(!has_locale(trlocale));
 
-	Vector<Ref<Translation>> vec = translations.get(locale);
+	Vector<Ref<Translation>> vec = translations.get(trlocale);
 	int index = vec.find(p_translation);
 	ERR_FAIL_COND(index < 0);
 
 	vec.remove_at(index);
 	if (vec.is_empty())
-		translations.erase(locale);
+		translations.erase(trlocale);
 }
 
 Array TranslationServer::get_translation_objects(const String &p_locale) const {
