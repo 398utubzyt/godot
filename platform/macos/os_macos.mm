@@ -153,19 +153,26 @@ void OS_MacOS::alert(const String &p_alert, const String &p_title) {
 	}
 }
 
-Error OS_MacOS::popup(const String &p_title, const String &p_message, const List<String> &p_buttons, int *r_pressed = nullptr) {
+Error OS_MacOS::popup(const String &p_title, const String &p_message, const List<String> &p_buttons, int *r_pressed) {
 	NSAlert *window [[NSAlert alloc] init];
 	NSString *ns_title = [NSString stringWithUTF8String:p_title.utf8().get_data()];
 	NSString *ns_message = [NSString stringWithUTF8String:p_message.utf8().get_data()];
-	NSString **ns_buttons = [NSString* alloc];
 
-	NSTextField *text_field = [NSTextField labelWithString:ns_alert];
+	List<Char8String> buttons;
+	for (String s : p_buttons)
+		buttons.push_back(s.utf8());
+
+	int button_count = p_buttons.size();
+	if (button_count > 8)
+		button_count = 8;
+
+	NSTextField *text_field = [NSTextField labelWithString:ns_message];
 	[text_field setAlignment:NSTextAlignmentCenter];
-	for (int i = 0; i < p_buttons.count; i++)
-		[window addButtonWithTitle:[NSString stringWithUTF8String:p_buttons[i].utf8().get_data()]];
+	for (int i = 0; i < button_count; i++)
+		[window addButtonWithTitle:[NSString stringWithUTF8String:buttons[i].get_data()]];
 	[window setMessageText:ns_title];
 	[window setAccessoryView:text_field];
-	[window setAlertStyle:NSAlertStyleWarning];
+	[window setAlertStyle:NSAlertStyleInformational];
 
 	id key_window = [[NSApplication sharedApplication] keyWindow];
 	[window runModal];
