@@ -567,7 +567,7 @@ PackedStringArray TranslationServer::get_loaded_locales() const {
 	return locales;
 }
 
-bool TranslationServer::has_locale(const String& p_locale) const
+bool TranslationServer::has_locale(const String &p_locale) const
 {
 	return translations.has(p_locale);
 }
