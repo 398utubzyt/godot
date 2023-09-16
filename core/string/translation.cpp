@@ -642,8 +642,7 @@ int TranslationServer::get_translation_object_count(const String &p_locale) cons
 	return res;
 }
 
-Ref<Translation> TranslationServer::get_translation_object_at(const String& p_locale, int p_index) const
-{
+Ref<Translation> TranslationServer::get_translation_object_at(const String& p_locale, int p_index) const {
 	Ref<Translation> res;
 	int best_score = 0;
 
@@ -674,14 +673,14 @@ void TranslationServer::clear() {
 
 Variant TranslationServer::translate(const StringName &p_message, const StringName &p_context) const {
 	// Match given message against the translation catalog for the project locale.
-	
+
 	if (!enabled) {
 #ifdef TOOLS_ENABLED
 		if (!Engine::get_singleton()->is_editor_hint()) {
 			WARN_PRINT("Translation Server is not enabled.");
 		}
 #endif
-		
+
 		return p_message;
 	}
 
