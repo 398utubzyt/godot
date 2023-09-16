@@ -56,7 +56,7 @@ Vector<String> Translation::_get_message_list() const {
 	msgs.resize(translation_map.size());
 	int idx = 0;
 	for (const KeyValue<StringName, HashMap<StringName, Variant>> &E : translation_map) {
-		for (const KeyValue<StringName, Variant>& E2 : E.value) {
+		for (const KeyValue<StringName, Variant> &E2 : E.value) {
 			msgs.set(idx, E2.key);
 			idx += 1;
 		}
