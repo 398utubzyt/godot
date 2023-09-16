@@ -51,7 +51,7 @@ TEST_CASE("[Translation] Messages") {
 
 	translation->erase_message("Hello");
 	// The message no longer exists, so it returns an empty string instead.
-	CHECK(translation->get_message("Hello") == "");
+	CHECK(translation->get_message("Hello") == Variant());
 
 	List<StringName> messages;
 	translation->get_message_list(&messages);
