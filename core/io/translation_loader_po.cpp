@@ -220,7 +220,7 @@ Ref<Resource> TranslationLoaderPO::load_translation(Ref<FileAccess> f, Error *r_
 							translation->add_plural_message(msg_id, msgs_plural, msg_context);
 						}
 					}
-				} else if (config.is_empty()) {
+				} /* else if (config.is_empty()) {
 					config = msg_str;
 					// Record plural rule.
 					int p_start = config.find("Plural-Forms");
@@ -230,7 +230,7 @@ Ref<Resource> TranslationLoaderPO::load_translation(Ref<FileAccess> f, Error *r_
 						//translation->set_plural_rule(config.substr(p_start, p_end - p_start));
 						//plural_forms = translation->get_plural_forms();
 					}
-				}
+				} */
 
 				l = l.substr(5, l.length()).strip_edges();
 				status = STATUS_READING_ID;
