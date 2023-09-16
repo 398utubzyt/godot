@@ -618,7 +618,7 @@ public:
 	void set_auto_translate(bool p_enable);
 	bool is_auto_translating() const;
 	_FORCE_INLINE_ String atr(const String p_string) const {
-		return is_auto_translating() ? tr(p_string) : p_string;
+		return is_auto_translating() ? (String)tr(p_string) : p_string;
 	};
 
 	// Extra properties.
