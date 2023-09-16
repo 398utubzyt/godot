@@ -100,7 +100,6 @@ void Translation::set_locale(const String &p_locale) {
 	}
 }
 
-
 bool Translation::can_add(const StringName &p_key, const Variant &p_text, const StringName &p_context) const {
 	if (p_text.get_type() == Variant::OBJECT && p_text.is_null())
 		return false;
@@ -567,8 +566,7 @@ PackedStringArray TranslationServer::get_loaded_locales() const {
 	return locales;
 }
 
-bool TranslationServer::has_locale(const String &p_locale) const
-{
+bool TranslationServer::has_locale(const String &p_locale) const {
 	return translations.has(p_locale);
 }
 
