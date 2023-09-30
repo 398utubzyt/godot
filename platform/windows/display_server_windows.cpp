@@ -1925,6 +1925,64 @@ void DisplayServerWindows::enable_for_stealing_focus(OS::ProcessID pid) {
 	AllowSetForegroundWindow(pid);
 }
 
+Error DisplayServerWindows::dialog_show(String p_title, String p_description, Vector<String> p_buttons, const Callable &p_callback) {
+#ifndef COMCTL_DISABLED
+	_THREAD_SAFE_METHOD_
+
+	TASKDIALOGCONFIG config;
+	ZeroMemory(&config, sizeof(TASKDIALOGCONFIG));
+	config.cbSize = sizeof(TASKDIALOGCONFIG);
+	
+	Char16String title = p_title.utf16();
+	Char16String message = p_description.utf16();
+	List<Char16String> buttons;
+	for (String s : p_buttons)
+		buttons.push_back(s.utf16());
+
+	config.pszWindowTitle = (LPCWSTR)(title.get_data());
+	config.pszContent = (LPCWSTR)(message.get_data());
+
+	const int button_count = MIN(buttons.size(), 8);
+	config.cButtons = button_count;
+
+	// No dynamic array size :(
+	TASKDIALOG_BUTTON *tbuttons = button_count != 0 ? (TASKDIALOG_BUTTON *)alloca(sizeof(TASKDIALOG_BUTTON) * button_count) : NULL;
+	if (tbuttons) {
+		for (int i = 0; i < button_count; i++) {
+			tbuttons[i].nButtonID = i;
+			tbuttons[i].pszButtonText = (LPCWSTR)(buttons[i].get_data());
+		}
+	}
+	config.pButtons = tbuttons;
+
+	int button_pressed;
+	if (FAILED(TaskDialogIndirect(&config, &button_pressed, NULL, NULL)))
+		return FAILED;
+
+	if (!p_callback.is_null()) {
+		Variant button = button_pressed;
+		Variant *buttonp = &button;
+		Variant fun_ret;
+		Callable::CallError ce;
+		p_callback.callp((const Variant **)&buttonp, 1, fun_ret, ce);
+	}
+#else
+	WARN_PRINT("Native dialogs are disabled for Windows.");
+#endif
+	return OK;
+}
+
+Error DisplayServerWindows::dialog_input_text(String p_title, String p_description, String p_partial, const Callable &p_callback) {
+#ifndef COMCTL_DISABLED
+	// TODO: Do the stupid COM UI stuff
+	WARN_PRINT("Native text input dialogs are not supported on Windows.");
+#else
+	WARN_PRINT("Native dialogs are disabled for Windows.");
+#endif
+
+	return OK;
+}
+
 int DisplayServerWindows::keyboard_get_layout_count() const {
 	return GetKeyboardLayoutList(0, nullptr);
 }

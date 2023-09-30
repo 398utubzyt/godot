@@ -64,8 +64,10 @@
 #pragma pack(pop, before_imagehlp)
 #endif
 
+#ifndef NO_COMCTL
 #pragma comment(linker, "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #pragma comment(lib, "comctl32.lib")
+#endif
 
 extern "C" {
 __declspec(dllexport) DWORD NvOptimusEnablement = 1;
@@ -156,13 +158,11 @@ Error OS_Windows::popup(const String &p_title, const String &p_message, const Li
 	config.hwndParent = main_window;
 	config.pszWindowTitle = (LPCWSTR)(title.get_data());
 	config.pszContent = (LPCWSTR)(message.get_data());
-
-	int button_count = buttons.size();
-	if (button_count > 8)
-		button_count = 8;
-
+	
+	const int button_count = MIN(buttons.size(), 8);
 	config.cButtons = button_count;
 
+	// No dynamic array size :(
 	TASKDIALOG_BUTTON *tbuttons = button_count != 0 ? (TASKDIALOG_BUTTON *)alloca(sizeof(TASKDIALOG_BUTTON) * button_count) : NULL;
 	if (tbuttons) {
 		for (int i = 0; i < button_count; i++) {

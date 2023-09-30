@@ -2864,6 +2864,11 @@ void DisplayServerX11::cursor_set_custom_image(const Ref<Resource> &p_cursor, Cu
 	}
 }
 
+Error DisplayServerX11::dialog_show(String p_title, String p_description, Vector<String> p_buttons, const Callable &p_callback) {
+	WARN_PRINT("Native prompt dialogs not supported on X11.");
+	return OK;
+}
+
 int DisplayServerX11::keyboard_get_layout_count() const {
 	int _group_count = 0;
 	XkbDescRec *kbd = XkbAllocKeyboard();

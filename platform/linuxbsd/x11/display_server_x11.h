@@ -496,6 +496,8 @@ public:
 	virtual CursorShape cursor_get_shape() const override;
 	virtual void cursor_set_custom_image(const Ref<Resource> &p_cursor, CursorShape p_shape, const Vector2 &p_hotspot) override;
 
+	virtual Error dialog_show(String p_title, String p_description, Vector<String> p_buttons, const Callable &p_callback) override;
+
 	virtual int keyboard_get_layout_count() const override;
 	virtual int keyboard_get_current_layout() const override;
 	virtual void keyboard_set_current_layout(int p_index) override;

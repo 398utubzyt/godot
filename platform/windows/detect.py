@@ -185,6 +185,7 @@ def get_opts():
         BoolVariable("use_static_cpp", "Link MinGW/MSVC C++ runtime libraries statically", True),
         BoolVariable("use_asan", "Use address sanitizer (ASAN)", False),
         BoolVariable("debug_crt", "Compile with MSVC's debug CRT (/MDd)", False),
+        BoolVariable("use_comctl", "Link comctl.dll, which enables support for native UI", True),
     ]
 
 
@@ -646,6 +647,9 @@ def configure(env: "Environment"):
     else:
         setup_mingw(env)
         env.msvc = False
+
+    if not env["use_comctl"]:
+        env.Append(CPPDEFINES=["NO_COMCTL"])
 
     # Now set compiler/linker flags
     if env.msvc:

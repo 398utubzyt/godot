@@ -462,6 +462,26 @@ namespace Godot.Bridge
             }
         }
 
+        [UnmanagedCallersOnly]
+        internal static unsafe godot_bool GetExistingScriptBridgeForPath(godot_string* scriptPath, godot_ref* outScript)
+        {
+            string scriptPathStr = Marshaling.ConvertStringToManaged(*scriptPath);
+
+            if (_pathTypeBiMap.TryGetScriptType(scriptPathStr, out Type? scriptType))
+            {
+                lock (_scriptTypeBiMap.ReadWriteLock)
+                {
+                    if (_scriptTypeBiMap.TryGetScriptPtr(scriptType, out IntPtr scriptPtr))
+                    {
+                        NativeFuncs.godotsharp_ref_new_from_ref_counted_ptr(out *outScript, scriptPtr);
+                        return godot_bool.True;
+                    }
+                }
+            }
+
+            return godot_bool.False;
+        }
+
         internal static unsafe void GetOrLoadOrCreateScriptForType(Type scriptType, godot_ref* outScript)
         {
             static bool GetPathOtherwiseGetOrCreateScript(Type scriptType, godot_ref* outScript,
