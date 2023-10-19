@@ -1310,6 +1310,14 @@ static GDExtensionScriptInstancePtr gdextension_object_get_script_instance(GDExt
 	return script_instance_extension->instance;
 }
 
+static GDExtensionInt gdextension_script_server_register(GDExtensionObjectPtr p_language) {
+	return ScriptServer::register_language((ScriptLanguage *)p_language) == OK ? static_cast<GDExtensionInt>(ScriptServer::get_language_count()) - 1 : -1;
+}
+
+static void gdextension_script_server_unregister(GDExtensionConstObjectPtr p_language) {
+	ScriptServer::unregister_language((const ScriptLanguage *)p_language);
+}
+
 static void gdextension_callable_custom_create(GDExtensionUninitializedTypePtr r_callable, GDExtensionCallableCustomInfo *p_custom_callable_info) {
 	memnew_placement(r_callable, Callable(memnew(CallableCustomExtension(p_custom_callable_info))));
 }
@@ -1511,6 +1519,8 @@ void gdextension_setup_interface() {
 	REGISTER_INTERFACE_FUNC(placeholder_script_instance_create);
 	REGISTER_INTERFACE_FUNC(placeholder_script_instance_update);
 	REGISTER_INTERFACE_FUNC(object_get_script_instance);
+	REGISTER_INTERFACE_FUNC(script_server_register);
+	REGISTER_INTERFACE_FUNC(script_server_unregister);
 	REGISTER_INTERFACE_FUNC(callable_custom_create);
 	REGISTER_INTERFACE_FUNC(callable_custom_get_userdata);
 	REGISTER_INTERFACE_FUNC(classdb_construct_object);

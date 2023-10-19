@@ -2366,6 +2366,28 @@ typedef void (*GDExtensionInterfacePlaceHolderScriptInstanceUpdate)(GDExtensionS
  */
 typedef GDExtensionScriptInstanceDataPtr (*GDExtensionInterfaceObjectGetScriptInstance)(GDExtensionConstObjectPtr p_object, GDExtensionObjectPtr p_language);
 
+/**
+ * @name script_server_register
+ * @since 4.3
+ *
+ * Register a new ScriptLanguage to the ScriptServer.
+ *
+ * @param p_language A pointer to the language to register.
+ *
+ * @return The index of the language in the ScriptServer, or -1 on failure.
+ */
+typedef GDExtensionInt (*GDExtensionInterfaceScriptServerRegister)(GDExtensionObjectPtr p_language);
+
+/**
+ * @name script_server_unregister
+ * @since 4.3
+ *
+ * Unregister a ScriptLanguage from the ScriptServer.
+ *
+ * @param p_language A pointer to the language to unregister.
+ */
+typedef void (*GDExtensionInterfaceScriptServerUnregister)(GDExtensionObjectPtr p_language);
+
 /* INTERFACE: Callable */
 
 /**
