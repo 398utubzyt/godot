@@ -1716,6 +1716,86 @@ typedef void (*GDExtensionInterfaceStringNameNewWithUtf8Chars)(GDExtensionUninit
  */
 typedef void (*GDExtensionInterfaceStringNameNewWithUtf8CharsAndLen)(GDExtensionUninitializedStringNamePtr r_dest, const char *p_contents, GDExtensionInt p_size);
 
+/**
+ * @name string_name_to_latin1_chars
+ * @since 4.3
+ *
+ * Converts a StringName to a Latin-1 encoded C string.
+ *
+ * It doesn't write a null terminator.
+ *
+ * @param p_self A pointer to the StringName.
+ * @param r_text A pointer to the buffer to hold the resulting data. If NULL is passed in, only the length will be computed.
+ * @param p_max_write_length The maximum number of characters that can be written to r_text. It has no affect on the return value.
+ *
+ * @return The resulting encoded string length in characters (not bytes), not including a null terminator.
+ */
+typedef GDExtensionInt (*GDExtensionInterfaceStringToLatin1Chars)(GDExtensionConstStringPtr p_self, char *r_text, GDExtensionInt p_max_write_length);
+
+/**
+ * @name string_name_to_utf8_chars
+ * @since 4.3
+ *
+ * Converts a StringName to a UTF-8 encoded C string.
+ *
+ * It doesn't write a null terminator.
+ *
+ * @param p_self A pointer to the StringName.
+ * @param r_text A pointer to the buffer to hold the resulting data. If NULL is passed in, only the length will be computed.
+ * @param p_max_write_length The maximum number of characters that can be written to r_text. It has no affect on the return value.
+ *
+ * @return The resulting encoded string length in characters (not bytes), not including a null terminator.
+ */
+typedef GDExtensionInt (*GDExtensionInterfaceStringToUtf8Chars)(GDExtensionConstStringPtr p_self, char *r_text, GDExtensionInt p_max_write_length);
+
+/**
+ * @name string_name_to_utf16_chars
+ * @since 4.3
+ *
+ * Converts a StringName to a UTF-16 encoded C string.
+ *
+ * It doesn't write a null terminator.
+ *
+ * @param p_self A pointer to the StringName.
+ * @param r_text A pointer to the buffer to hold the resulting data. If NULL is passed in, only the length will be computed.
+ * @param p_max_write_length The maximum number of characters that can be written to r_text. It has no affect on the return value.
+ *
+ * @return The resulting encoded string length in characters (not bytes), not including a null terminator.
+ */
+typedef GDExtensionInt (*GDExtensionInterfaceStringToUtf16Chars)(GDExtensionConstStringPtr p_self, char16_t *r_text, GDExtensionInt p_max_write_length);
+
+/**
+ * @name string_name_to_utf32_chars
+ * @since 4.3
+ *
+ * Converts a StringName to a UTF-32 encoded C string.
+ *
+ * It doesn't write a null terminator.
+ *
+ * @param p_self A pointer to the StringName.
+ * @param r_text A pointer to the buffer to hold the resulting data. If NULL is passed in, only the length will be computed.
+ * @param p_max_write_length The maximum number of characters that can be written to r_text. It has no affect on the return value.
+ *
+ * @return The resulting encoded string length in characters (not bytes), not including a null terminator.
+ */
+typedef GDExtensionInt (*GDExtensionInterfaceStringToUtf32Chars)(GDExtensionConstStringPtr p_self, char32_t *r_text, GDExtensionInt p_max_write_length);
+
+/**
+ * @name string_name_to_wide_chars
+ * @since 4.3
+ *
+ * Converts a StringName to a wide C string.
+ *
+ * It doesn't write a null terminator.
+ *
+ * @param p_self A pointer to the String.
+ * @param r_text A pointer to the buffer to hold the resulting data. If NULL is passed in, only the length will be computed.
+ * @param p_max_write_length The maximum number of characters that can be written to r_text. It has no affect on the return value.
+ *
+ * @return The resulting encoded string length in characters (not bytes), not including a null terminator.
+ */
+typedef GDExtensionInt (*GDExtensionInterfaceStringToWideChars)(GDExtensionConstStringPtr p_self, wchar_t *r_text, GDExtensionInt p_max_write_length);
+
 /* INTERFACE: XMLParser Utilities */
 
 /**
