@@ -355,7 +355,7 @@ void OS::set_cmdline(const char *p_execpath, const List<String> &p_args, const L
 }
 
 String OS::get_unique_id() const {
-	ERR_FAIL_V("");
+	return "";
 }
 
 int OS::get_processor_count() const {
@@ -490,6 +490,12 @@ bool OS::has_feature(const String &p_feature) {
 	}
 #endif
 
+#if defined(IOS_SIMULATOR)
+	if (p_feature == "simulator") {
+		return true;
+	}
+#endif
+
 	if (_check_internal_feature_support(p_feature)) {
 		return true;
 	}
@@ -502,6 +508,10 @@ bool OS::has_feature(const String &p_feature) {
 		return true;
 	}
 
+	return false;
+}
+
+bool OS::is_sandboxed() const {
 	return false;
 }
 

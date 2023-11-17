@@ -39,7 +39,7 @@ import android.os.*
 import android.util.Log
 import android.widget.Toast
 import androidx.window.layout.WindowMetricsCalculator
-import org.godotengine.godot.FullScreenGodotApp
+import org.godotengine.godot.GodotActivity
 import org.godotengine.godot.GodotLib
 import org.godotengine.godot.utils.PermissionsUtil
 import org.godotengine.godot.utils.ProcessPhoenix
@@ -55,7 +55,7 @@ import kotlin.math.min
  *
  * It also plays the role of the primary editor window.
  */
-open class GodotEditor : FullScreenGodotApp() {
+open class GodotEditor : GodotActivity() {
 
 	companion object {
 		private val TAG = GodotEditor::class.java.simpleName
@@ -91,10 +91,6 @@ open class GodotEditor : FullScreenGodotApp() {
 	private val commandLineParams = ArrayList<String>()
 
 	override fun onCreate(savedInstanceState: Bundle?) {
-		// We exclude certain permissions from the set we request at startup, as they'll be
-		// requested on demand based on use-cases.
-		PermissionsUtil.requestManifestPermissions(this, setOf(Manifest.permission.RECORD_AUDIO))
-
 		val params = intent.getStringArrayExtra(EXTRA_COMMAND_LINE_PARAMS)
 		Log.d(TAG, "Received parameters ${params.contentToString()}")
 		updateCommandLineParams(params)
@@ -115,7 +111,7 @@ open class GodotEditor : FullScreenGodotApp() {
 
 		runOnUiThread {
 			// Enable long press, panning and scaling gestures
-			godotFragment?.renderView?.inputHandler?.apply {
+			godotFragment?.godot?.renderView?.inputHandler?.apply {
 				enableLongPress(longPressEnabled)
 				enablePanningAndScalingGestures(panScaleEnabled)
 			}
@@ -318,7 +314,7 @@ open class GodotEditor : FullScreenGodotApp() {
 
 	override fun onRequestPermissionsResult(
 		requestCode: Int,
-		permissions: Array<String?>,
+		permissions: Array<String>,
 		grantResults: IntArray
 	) {
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults)

@@ -113,7 +113,7 @@ public:
 	// GDScript keywords.
 	RegEx keyword_gdscript_tool = RegEx("^tool");
 	RegEx keyword_gdscript_export_single = RegEx("^export");
-	RegEx keyword_gdscript_export_mutli = RegEx("([\t]+)export\\b");
+	RegEx keyword_gdscript_export_multi = RegEx("([\t]+)export\\b");
 	RegEx keyword_gdscript_onready = RegEx("^onready");
 	RegEx keyword_gdscript_remote = RegEx("^remote func");
 	RegEx keyword_gdscript_remotesync = RegEx("^remotesync func");
@@ -138,6 +138,9 @@ public:
 	// Colors.
 	LocalVector<RegEx *> color_regexes;
 	LocalVector<String> color_renamed;
+
+	RegEx color_hexadecimal_short_constructor = RegEx("Color\\(\"#?([a-fA-F0-9]{1})([a-fA-F0-9]{3})\\b");
+	RegEx color_hexadecimal_full_constructor = RegEx("Color\\(\"#?([a-fA-F0-9]{2})([a-fA-F0-9]{6})\\b");
 
 	// Classes.
 	LocalVector<RegEx *> class_tscn_regexes;
@@ -336,7 +339,7 @@ bool ProjectConverter3To4::convert() {
 	// Checking if folder contains valid Godot 3 project.
 	// Project should not be converted more than once.
 	{
-		String converter_text = "; Project was converted by built-in tool to Godot 4.0";
+		String converter_text = "; Project was converted by built-in tool to Godot 4";
 
 		ERR_FAIL_COND_V_MSG(!FileAccess::exists("project.godot"), false, "Current working directory doesn't contain a \"project.godot\" file for a Godot 3 project.");
 
@@ -409,6 +412,8 @@ bool ProjectConverter3To4::convert() {
 				rename_common(RenamesMap3To4::theme_override_renames, reg_container.theme_override_regexes, source_lines);
 
 				custom_rename(source_lines, "\\.shader", ".gdshader");
+
+				convert_hexadecimal_colors(source_lines, reg_container);
 			} else if (file_name.ends_with(".tscn")) {
 				fix_pause_mode(source_lines, reg_container);
 
@@ -429,6 +434,8 @@ bool ProjectConverter3To4::convert() {
 				rename_common(RenamesMap3To4::theme_override_renames, reg_container.theme_override_regexes, source_lines);
 
 				custom_rename(source_lines, "\\.shader", ".gdshader");
+
+				convert_hexadecimal_colors(source_lines, reg_container);
 			} else if (file_name.ends_with(".cs")) { // TODO, C# should use different methods.
 				rename_classes(source_lines, reg_container); // Using only specialized function.
 				rename_common(RenamesMap3To4::csharp_function_renames, reg_container.csharp_function_regexes, source_lines);
@@ -438,6 +445,7 @@ bool ProjectConverter3To4::convert() {
 				rename_csharp_functions(source_lines, reg_container);
 				rename_csharp_attributes(source_lines, reg_container);
 				custom_rename(source_lines, "public class ", "public partial class ");
+				convert_hexadecimal_colors(source_lines, reg_container);
 			} else if (file_name.ends_with(".gdshader") || file_name.ends_with(".shader")) {
 				rename_common(RenamesMap3To4::shaders_renames, reg_container.shaders_regexes, source_lines);
 			} else if (file_name.ends_with("tres")) {
@@ -536,7 +544,7 @@ bool ProjectConverter3To4::validate_conversion() {
 	// Checking if folder contains valid Godot 3 project.
 	// Project should not be converted more than once.
 	{
-		String conventer_text = "; Project was converted by built-in tool to Godot 4.0";
+		String conventer_text = "; Project was converted by built-in tool to Godot 4";
 
 		ERR_FAIL_COND_V_MSG(!FileAccess::exists("project.godot"), false, "Current directory doesn't contain any Godot 3 project");
 
@@ -857,16 +865,16 @@ bool ProjectConverter3To4::test_conversion(RegExContainer &reg_container) {
 	valid = valid && test_conversion_gdscript_builtin("\tif OS.get_borderless_window(): pass", "\tif get_window().borderless: pass", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
 	valid = valid && test_conversion_gdscript_builtin("\tOS.set_borderless_window(Settings.borderless)", "\tget_window().borderless = (Settings.borderless)", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
 
-	valid = valid && test_conversion_gdscript_builtin("\tvar aa = roman(r.move_and_slide( a, b, c, d, e, f )) # Roman", "\tr.set_velocity(a)\n\tr.set_up_direction(b)\n\tr.set_floor_stop_on_slope_enabled(c)\n\tr.set_max_slides(d)\n\tr.set_floor_max_angle(e)\n\t# TODOConverter40 infinite_inertia were removed in Godot 4.0 - previous value `f`\n\tr.move_and_slide()\n\tvar aa = roman(r.velocity) # Roman", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
-	valid = valid && test_conversion_gdscript_builtin("\tmove_and_slide( a, b, c, d, e, f ) # Roman", "\tset_velocity(a)\n\tset_up_direction(b)\n\tset_floor_stop_on_slope_enabled(c)\n\tset_max_slides(d)\n\tset_floor_max_angle(e)\n\t# TODOConverter40 infinite_inertia were removed in Godot 4.0 - previous value `f`\n\tmove_and_slide() # Roman", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
-	valid = valid && test_conversion_gdscript_builtin("\tvar aa = roman(r.move_and_slide_with_snap( a, g, b, c, d, e, f )) # Roman", "\tr.set_velocity(a)\n\t# TODOConverter40 looks that snap in Godot 4.0 is float, not vector like in Godot 3 - previous value `g`\n\tr.set_up_direction(b)\n\tr.set_floor_stop_on_slope_enabled(c)\n\tr.set_max_slides(d)\n\tr.set_floor_max_angle(e)\n\t# TODOConverter40 infinite_inertia were removed in Godot 4.0 - previous value `f`\n\tr.move_and_slide()\n\tvar aa = roman(r.velocity) # Roman", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
-	valid = valid && test_conversion_gdscript_builtin("\tmove_and_slide_with_snap( a, g, b, c, d, e, f ) # Roman", "\tset_velocity(a)\n\t# TODOConverter40 looks that snap in Godot 4.0 is float, not vector like in Godot 3 - previous value `g`\n\tset_up_direction(b)\n\tset_floor_stop_on_slope_enabled(c)\n\tset_max_slides(d)\n\tset_floor_max_angle(e)\n\t# TODOConverter40 infinite_inertia were removed in Godot 4.0 - previous value `f`\n\tmove_and_slide() # Roman", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
+	valid = valid && test_conversion_gdscript_builtin("\tvar aa = roman(r.move_and_slide( a, b, c, d, e, f )) # Roman", "\tr.set_velocity(a)\n\tr.set_up_direction(b)\n\tr.set_floor_stop_on_slope_enabled(c)\n\tr.set_max_slides(d)\n\tr.set_floor_max_angle(e)\n\t# TODOConverter3To4 infinite_inertia were removed in Godot 4 - previous value `f`\n\tr.move_and_slide()\n\tvar aa = roman(r.velocity) # Roman", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
+	valid = valid && test_conversion_gdscript_builtin("\tmove_and_slide( a, b, c, d, e, f ) # Roman", "\tset_velocity(a)\n\tset_up_direction(b)\n\tset_floor_stop_on_slope_enabled(c)\n\tset_max_slides(d)\n\tset_floor_max_angle(e)\n\t# TODOConverter3To4 infinite_inertia were removed in Godot 4 - previous value `f`\n\tmove_and_slide() # Roman", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
+	valid = valid && test_conversion_gdscript_builtin("\tvar aa = roman(r.move_and_slide_with_snap( a, g, b, c, d, e, f )) # Roman", "\tr.set_velocity(a)\n\t# TODOConverter3To4 looks that snap in Godot 4 is float, not vector like in Godot 3 - previous value `g`\n\tr.set_up_direction(b)\n\tr.set_floor_stop_on_slope_enabled(c)\n\tr.set_max_slides(d)\n\tr.set_floor_max_angle(e)\n\t# TODOConverter3To4 infinite_inertia were removed in Godot 4 - previous value `f`\n\tr.move_and_slide()\n\tvar aa = roman(r.velocity) # Roman", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
+	valid = valid && test_conversion_gdscript_builtin("\tmove_and_slide_with_snap( a, g, b, c, d, e, f ) # Roman", "\tset_velocity(a)\n\t# TODOConverter3To4 looks that snap in Godot 4 is float, not vector like in Godot 3 - previous value `g`\n\tset_up_direction(b)\n\tset_floor_stop_on_slope_enabled(c)\n\tset_max_slides(d)\n\tset_floor_max_angle(e)\n\t# TODOConverter3To4 infinite_inertia were removed in Godot 4 - previous value `f`\n\tmove_and_slide() # Roman", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
 
 	valid = valid && test_conversion_gdscript_builtin("remove_and_slide(a,b,c,d,e,f)", "remove_and_slide(a,b,c,d,e,f)", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
 
-	valid = valid && test_conversion_gdscript_builtin("list_dir_begin( a , b )", "list_dir_begin() # TODOGODOT4 fill missing arguments https://github.com/godotengine/godot/pull/40547", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
-	valid = valid && test_conversion_gdscript_builtin("list_dir_begin( a )", "list_dir_begin() # TODOGODOT4 fill missing arguments https://github.com/godotengine/godot/pull/40547", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
-	valid = valid && test_conversion_gdscript_builtin("list_dir_begin( )", "list_dir_begin() # TODOGODOT4 fill missing arguments https://github.com/godotengine/godot/pull/40547", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
+	valid = valid && test_conversion_gdscript_builtin("list_dir_begin( a , b )", "list_dir_begin() # TODOConverter3To4 fill missing arguments https://github.com/godotengine/godot/pull/40547", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
+	valid = valid && test_conversion_gdscript_builtin("list_dir_begin( a )", "list_dir_begin() # TODOConverter3To4 fill missing arguments https://github.com/godotengine/godot/pull/40547", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
+	valid = valid && test_conversion_gdscript_builtin("list_dir_begin( )", "list_dir_begin() # TODOConverter3To4 fill missing arguments https://github.com/godotengine/godot/pull/40547", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
 
 	valid = valid && test_conversion_gdscript_builtin("sort_custom( a , b )", "sort_custom(Callable(a, b))", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
 
@@ -874,9 +882,9 @@ bool ProjectConverter3To4::test_conversion(RegExContainer &reg_container) {
 
 	valid = valid && test_conversion_gdscript_builtin("draw_line(1, 2, 3, 4, 5)", "draw_line(1, 2, 3, 4)", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
 
-	valid = valid && test_conversion_gdscript_builtin("\timage.lock()", "\tfalse # image.lock() # TODOConverter40, Image no longer requires locking, `false` helps to not break one line if/else, so it can freely be removed", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
-	valid = valid && test_conversion_gdscript_builtin("\timage.unlock()", "\tfalse # image.unlock() # TODOConverter40, Image no longer requires locking, `false` helps to not break one line if/else, so it can freely be removed", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
-	valid = valid && test_conversion_gdscript_builtin("\troman.image.unlock()", "\tfalse # roman.image.unlock() # TODOConverter40, Image no longer requires locking, `false` helps to not break one line if/else, so it can freely be removed", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
+	valid = valid && test_conversion_gdscript_builtin("\timage.lock()", "\tfalse # image.lock() # TODOConverter3To4, Image no longer requires locking, `false` helps to not break one line if/else, so it can freely be removed", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
+	valid = valid && test_conversion_gdscript_builtin("\timage.unlock()", "\tfalse # image.unlock() # TODOConverter3To4, Image no longer requires locking, `false` helps to not break one line if/else, so it can freely be removed", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
+	valid = valid && test_conversion_gdscript_builtin("\troman.image.unlock()", "\tfalse # roman.image.unlock() # TODOConverter3To4, Image no longer requires locking, `false` helps to not break one line if/else, so it can freely be removed", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
 	valid = valid && test_conversion_gdscript_builtin("\tmtx.lock()", "\tmtx.lock()", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
 	valid = valid && test_conversion_gdscript_builtin("\tmutex.unlock()", "\tmutex.unlock()", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
 
@@ -998,13 +1006,16 @@ bool ProjectConverter3To4::test_conversion(RegExContainer &reg_container) {
 
 	valid = valid && test_conversion_gdscript_builtin("apply_force(position, impulse)", "apply_force(impulse, position)", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
 	valid = valid && test_conversion_gdscript_builtin("apply_impulse(position, impulse)", "apply_impulse(impulse, position)", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
-	valid = valid && test_conversion_gdscript_builtin("draw_rect(a,b,c,d,e).abc", "draw_rect(a, b, c, d).abc# e) TODOGODOT4 Antialiasing argument is missing", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
+	valid = valid && test_conversion_gdscript_builtin("draw_rect(a,b,c,d,e).abc", "draw_rect(a, b, c, d).abc# e) TODOConverter3To4 Antialiasing argument is missing", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
 	valid = valid && test_conversion_gdscript_builtin("get_focus_owner()", "get_viewport().gui_get_focus_owner()", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
 	valid = valid && test_conversion_gdscript_builtin("button.pressed = 1", "button.button_pressed = 1", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
 	valid = valid && test_conversion_gdscript_builtin("button.pressed=1", "button.button_pressed=1", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
 	valid = valid && test_conversion_gdscript_builtin("button.pressed SF", "button.pressed SF", &ProjectConverter3To4::rename_gdscript_functions, "custom rename", reg_container, false);
 
-	valid = valid && test_conversion_with_regex("AAA Color.white AF", "AAA Color.WHITE AF", &ProjectConverter3To4::rename_colors, "custom rename", reg_container);
+	valid = valid && test_conversion_with_regex("Color(\"#f47d\")", "Color(\"#47df\")", &ProjectConverter3To4::convert_hexadecimal_colors, "color literals", reg_container);
+	valid = valid && test_conversion_with_regex("Color(\"#ff478cbf\")", "Color(\"#478cbfff\")", &ProjectConverter3To4::convert_hexadecimal_colors, "color literals", reg_container);
+	valid = valid && test_conversion_with_regex("Color(\"#de32bf\")", "Color(\"#de32bf\")", &ProjectConverter3To4::convert_hexadecimal_colors, "color literals", reg_container);
+	valid = valid && test_conversion_with_regex("AAA Color.white AF", "AAA Color.WHITE AF", &ProjectConverter3To4::rename_colors, "color constants", reg_container);
 
 	// Note: Do not change to *scancode*, it is applied before that conversion.
 	valid = valid && test_conversion_with_regex("\"device\":-1,\"scancode\":16777231,\"physical_scancode\":16777232", "\"device\":-1,\"scancode\":4194319,\"physical_scancode\":4194320", &ProjectConverter3To4::rename_input_map_scancode, "custom rename", reg_container);
@@ -1149,13 +1160,13 @@ bool ProjectConverter3To4::test_array_names() {
 
 			// Light2D, Texture, Viewport are special classes(probably virtual ones).
 			if (ClassDB::class_exists(StringName(old_class)) && old_class != "Light2D" && old_class != "Texture" && old_class != "Viewport") {
-				ERR_PRINT(vformat("Class \"%s\" exists in Godot 4.0, so it cannot be renamed to something else.", old_class));
+				ERR_PRINT(vformat("Class \"%s\" exists in Godot 4, so it cannot be renamed to something else.", old_class));
 				valid = false; // This probably should be only a warning, but not 100% sure - this would need to be added to CI.
 			}
 
 			// Callable is special class, to which normal classes may be renamed.
 			if (!ClassDB::class_exists(StringName(new_class)) && new_class != "Callable") {
-				ERR_PRINT(vformat("Class \"%s\" does not exist in Godot 4.0, so it cannot be used in the conversion.", old_class));
+				ERR_PRINT(vformat("Class \"%s\" does not exist in Godot 4, so it cannot be used in the conversion.", old_class));
 				valid = false; // This probably should be only a warning, but not 100% sure - this would need to be added to CI.
 			}
 		}
@@ -1458,6 +1469,23 @@ void ProjectConverter3To4::rename_colors(Vector<SourceLine> &source_lines, const
 	}
 };
 
+// Convert hexadecimal colors from ARGB to RGBA
+void ProjectConverter3To4::convert_hexadecimal_colors(Vector<SourceLine> &source_lines, const RegExContainer &reg_container) {
+	for (SourceLine &source_line : source_lines) {
+		if (source_line.is_comment) {
+			continue;
+		}
+
+		String &line = source_line.line;
+		if (uint64_t(line.length()) <= maximum_line_length) {
+			if (line.contains("Color(\"")) {
+				line = reg_container.color_hexadecimal_short_constructor.sub(line, "Color(\"#$2$1", true);
+				line = reg_container.color_hexadecimal_full_constructor.sub(line, "Color(\"#$2$1", true);
+			}
+		}
+	}
+}
+
 Vector<String> ProjectConverter3To4::check_for_rename_colors(Vector<String> &lines, const RegExContainer &reg_container) {
 	Vector<String> found_renames;
 
@@ -1630,8 +1658,8 @@ void ProjectConverter3To4::process_gdscript_line(String &line, const RegExContai
 	// With longer lines, doing so can sometimes be significantly faster.
 
 	if ((line.contains(".lock") || line.contains(".unlock")) && !line.contains("mtx") && !line.contains("mutex") && !line.contains("Mutex")) {
-		line = reg_container.reg_image_lock.sub(line, "false # $1.lock() # TODOConverter40, Image no longer requires locking, `false` helps to not break one line if/else, so it can freely be removed", true);
-		line = reg_container.reg_image_unlock.sub(line, "false # $1.unlock() # TODOConverter40, Image no longer requires locking, `false` helps to not break one line if/else, so it can freely be removed", true);
+		line = reg_container.reg_image_lock.sub(line, "false # $1.lock() # TODOConverter3To4, Image no longer requires locking, `false` helps to not break one line if/else, so it can freely be removed", true);
+		line = reg_container.reg_image_unlock.sub(line, "false # $1.unlock() # TODOConverter3To4, Image no longer requires locking, `false` helps to not break one line if/else, so it can freely be removed", true);
 	}
 
 	// PackedStringArray(req_godot).join('.') -> '.'.join(PackedStringArray(req_godot))       PoolStringArray
@@ -1832,7 +1860,7 @@ void ProjectConverter3To4::process_gdscript_line(String &line, const RegExContai
 
 				// infiinite_interia
 				if (parts.size() >= 6) {
-					line_new += starting_space + "# TODOConverter40 infinite_inertia were removed in Godot 4.0 - previous value `" + parts[5] + "`\n";
+					line_new += starting_space + "# TODOConverter3To4 infinite_inertia were removed in Godot 4 - previous value `" + parts[5] + "`\n";
 				}
 
 				line_new += starting_space + base_obj + "move_and_slide()";
@@ -1863,7 +1891,7 @@ void ProjectConverter3To4::process_gdscript_line(String &line, const RegExContai
 
 				// snap
 				if (parts.size() >= 2) {
-					line_new += starting_space + "# TODOConverter40 looks that snap in Godot 4.0 is float, not vector like in Godot 3 - previous value `" + parts[1] + "`\n";
+					line_new += starting_space + "# TODOConverter3To4 looks that snap in Godot 4 is float, not vector like in Godot 3 - previous value `" + parts[1] + "`\n";
 				}
 
 				// up_direction
@@ -1888,7 +1916,7 @@ void ProjectConverter3To4::process_gdscript_line(String &line, const RegExContai
 
 				// infiinite_interia
 				if (parts.size() >= 7) {
-					line_new += starting_space + "# TODOConverter40 infinite_inertia were removed in Godot 4.0 - previous value `" + parts[6] + "`\n";
+					line_new += starting_space + "# TODOConverter3To4 infinite_inertia were removed in Godot 4 - previous value `" + parts[6] + "`\n";
 				}
 
 				line_new += starting_space + base_obj + "move_and_slide()";
@@ -1919,7 +1947,7 @@ void ProjectConverter3To4::process_gdscript_line(String &line, const RegExContai
 		int start = line.find("list_dir_begin(");
 		int end = get_end_parenthesis(line.substr(start)) + 1;
 		if (end > -1) {
-			line = line.substr(0, start) + "list_dir_begin() " + line.substr(end + start) + "# TODOGODOT4 fill missing arguments https://github.com/godotengine/godot/pull/40547";
+			line = line.substr(0, start) + "list_dir_begin() " + line.substr(end + start) + "# TODOConverter3To4 fill missing arguments https://github.com/godotengine/godot/pull/40547";
 		}
 	}
 
@@ -2203,14 +2231,14 @@ void ProjectConverter3To4::process_gdscript_line(String &line, const RegExContai
 			}
 		}
 	}
-	//  draw_rect(a,b,c,d,e)  ->   draw_rect(a,b,c,d)#e) TODOGODOT4 Antialiasing argument is missing
+	//  draw_rect(a,b,c,d,e)  ->   draw_rect(a,b,c,d)#e) TODOConverter3To4 Antialiasing argument is missing
 	if (contains_function_call(line, "draw_rect(")) {
 		int start = line.find("draw_rect(");
 		int end = get_end_parenthesis(line.substr(start)) + 1;
 		if (end > -1) {
 			Vector<String> parts = parse_arguments(line.substr(start, end));
 			if (parts.size() == 5) {
-				line = line.substr(0, start) + "draw_rect(" + parts[0] + ", " + parts[1] + ", " + parts[2] + ", " + parts[3] + ")" + line.substr(end + start) + "# " + parts[4] + ") TODOGODOT4 Antialiasing argument is missing";
+				line = line.substr(0, start) + "draw_rect(" + parts[0] + ", " + parts[1] + ", " + parts[2] + ", " + parts[3] + ")" + line.substr(end + start) + "# " + parts[4] + ") TODOConverter3To4 Antialiasing argument is missing";
 			}
 		}
 	}
@@ -2241,9 +2269,10 @@ void ProjectConverter3To4::process_gdscript_line(String &line, const RegExContai
 
 	// rotating = true  ->   ignore_rotation = false # reversed "rotating" for Camera2D
 	if (contains_function_call(line, "rotating")) {
-		int start = line.find("rotating");
+		String function_name = "rotating";
+		int start = line.find(function_name);
 		bool foundNextEqual = false;
-		String line_to_check = line.substr(start + String("rotating").length());
+		String line_to_check = line.substr(start + function_name.length());
 		String assigned_value;
 		for (int current_index = 0; line_to_check.length() > current_index; current_index++) {
 			char32_t chr = line_to_check.get(current_index);
@@ -2251,14 +2280,14 @@ void ProjectConverter3To4::process_gdscript_line(String &line, const RegExContai
 				continue;
 			} else if (chr == '=') {
 				foundNextEqual = true;
-				assigned_value = line.right(current_index).strip_edges();
+				assigned_value = line.substr(start + function_name.length() + current_index + 1).strip_edges();
 				assigned_value = assigned_value == "true" ? "false" : "true";
 			} else {
 				break;
 			}
 		}
 		if (foundNextEqual) {
-			line = line.substr(0, start) + "ignore_rotation =" + assigned_value + " # reversed \"rotating\" for Camera2D";
+			line = line.substr(0, start) + "ignore_rotation = " + assigned_value + " # reversed \"rotating\" for Camera2D";
 		}
 	}
 
@@ -2519,7 +2548,7 @@ void ProjectConverter3To4::rename_gdscript_keywords(Vector<SourceLine> &source_l
 				line = reg_container.keyword_gdscript_export_single.sub(line, "@export", true);
 			}
 			if (line.contains("export")) {
-				line = reg_container.keyword_gdscript_export_mutli.sub(line, "$1@export", true);
+				line = reg_container.keyword_gdscript_export_multi.sub(line, "$1@export", true);
 			}
 			if (line.contains("onready")) {
 				line = reg_container.keyword_gdscript_onready.sub(line, "@onready", true);
@@ -2578,7 +2607,7 @@ Vector<String> ProjectConverter3To4::check_for_rename_gdscript_keywords(Vector<S
 
 			if (line.contains("export")) {
 				old = line;
-				line = reg_container.keyword_gdscript_export_mutli.sub(line, "@export", true);
+				line = reg_container.keyword_gdscript_export_multi.sub(line, "@export", true);
 				if (old != line) {
 					found_renames.append(line_formatter(current_line, "export", "@export", line));
 				}

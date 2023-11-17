@@ -164,6 +164,27 @@ String OS_LinuxBSD::get_processor_name() const {
 	ERR_FAIL_V_MSG("", String("Couldn't get the CPU model name from `/proc/cpuinfo`. Returning an empty string."));
 }
 
+bool OS_LinuxBSD::is_sandboxed() const {
+	// This function is derived from SDL:
+	// https://github.com/libsdl-org/SDL/blob/main/src/core/linux/SDL_sandbox.c#L28-L45
+
+	if (access("/.flatpak-info", F_OK) == 0) {
+		return true;
+	}
+
+	// For Snap, we check multiple variables because they might be set for
+	// unrelated reasons. This is the same thing WebKitGTK does.
+	if (has_environment("SNAP") && has_environment("SNAP_NAME") && has_environment("SNAP_REVISION")) {
+		return true;
+	}
+
+	if (access("/run/host/container-manager", F_OK) == 0) {
+		return true;
+	}
+
+	return false;
+}
+
 void OS_LinuxBSD::finalize() {
 	if (main_loop) {
 		memdelete(main_loop);
@@ -954,45 +975,33 @@ static String get_mountpoint(const String &p_path) {
 }
 
 Error OS_LinuxBSD::move_to_trash(const String &p_path) {
-	String path = p_path.rstrip("/"); // Strip trailing slash when path points to a directory
+	// We try multiple methods, until we find one that works.
+	// So we only return on success until we exhausted possibilities.
 
+	String path = p_path.rstrip("/"); // Strip trailing slash when path points to a directory.
 	int err_code;
 	List<String> args;
 	args.push_back(path);
-	args.push_front("trash"); // The command is `gio trash <file_name>` so we need to add it to args.
+
+	args.push_front("trash"); // The command is `gio trash <file_name>` so we add it before the path.
 	Error result = execute("gio", args, nullptr, &err_code); // For GNOME based machines.
-	if (result == OK) { // The `execute` function has done its job without errors.
-		if (!err_code) { // The shell command has been executed without errors.
-			return OK;
-		} else if (err_code == 1) {
-			ERR_PRINT("move_to_trash: No such file or directory as " + path + ".");
-			return ERR_FILE_NOT_FOUND;
-		}
+	if (result == OK && err_code == 0) { // Success.
+		return OK;
 	}
 
 	args.pop_front();
 	args.push_front("move");
 	args.push_back("trash:/"); // The command is `kioclient5 move <file_name> trash:/`.
 	result = execute("kioclient5", args, nullptr, &err_code); // For KDE based machines.
-	if (result == OK) { // The `execute` function has done its job without errors.
-		if (!err_code) { // The shell command has been executed without errors.
-			return OK;
-		} else if (err_code == 1) {
-			ERR_PRINT("move_to_trash: No such file or directory as " + path + ".");
-			return ERR_FILE_NOT_FOUND;
-		}
+	if (result == OK && err_code == 0) {
+		return OK;
 	}
 
 	args.pop_front();
 	args.pop_back();
 	result = execute("gvfs-trash", args, nullptr, &err_code); // For older Linux machines.
-	if (result == OK) { // The `execute` function has done its job without errors.
-		if (!err_code) { // The shell command has been executed without errors.
-			return OK;
-		} else if (err_code == 1) {
-			ERR_PRINT("move_to_trash: No such file or directory as " + path + ".");
-			return ERR_FILE_NOT_FOUND;
-		}
+	if (result == OK && err_code == 0) {
+		return OK;
 	}
 
 	// If the commands `kioclient5`, `gio` or `gvfs-trash` don't work on the system we do it manually.

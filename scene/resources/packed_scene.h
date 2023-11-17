@@ -136,6 +136,7 @@ public:
 	};
 
 	static void set_disable_placeholders(bool p_disable);
+	static Ref<Resource> get_remap_resource(const Ref<Resource> &p_resource, HashMap<Ref<Resource>, Ref<Resource>> &remap_cache, const Ref<Resource> &p_fallback, Node *p_for_scene);
 
 	int find_node_by_path(const NodePath &p_node) const;
 	Variant get_property_value(int p_node, const StringName &p_property, bool &found) const;
@@ -255,6 +256,7 @@ public:
 	virtual void set_path(const String &p_path, bool p_take_over = false) override;
 #ifdef TOOLS_ENABLED
 	virtual void set_last_modified_time(uint64_t p_time) override {
+		Resource::set_last_modified_time(p_time);
 		state->set_last_modified_time(p_time);
 	}
 
